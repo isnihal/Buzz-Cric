@@ -4,15 +4,14 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    static int numberOfOvers, numberOfBalls, totalRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns, nonStrikerRuns;
+    static int numberOfOvers, numberOfBalls,firstInningRuns,secondInningRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns, nonStrikerRuns;
     int nextBallScore;
     public Text ballDisplay, strikerDisplay, nonStrikerDisplay, overDisplay, runDisplayText;
-    bool inningsBreak,firstInnings;
+    bool firstInnings;
 
     // Use this for initialization
     void Start () {
         firstInnings = true;
-        inningsBreak = false;
         resetGameVariables();
 	}
 
@@ -21,19 +20,37 @@ public class GameManager : MonoBehaviour {
     void Update()
     {
         setScoreBoards();
-        if(InningsBreak())
+
+        //Check for 1st innings break(All out or 20 overs)
+        if (InningsBreak())
         {
             firstInnings = false;
             resetGameVariables();
+        }
+
+        //Check for 2nd innings break
+        if (!firstInnings)
+        {
+            if (InningsBreak())
+            {
+                Debug.Log("Game Over");
+                gameOver();
+            }
         }
     }
 
     void resetGameVariables()
     {
-        inningsBreak = false;
         numberOfOvers = 0;
         numberOfBalls = 0;
-        totalRuns = 0;
+        if(firstInnings)
+        {
+            firstInningRuns = 0;
+        }
+        else
+        {
+            secondInningRuns = 0;
+        }
         strikerRuns = 0;
         nonStrikerRuns = 0;
         wicketsGone = 0;
@@ -48,11 +65,11 @@ public class GameManager : MonoBehaviour {
         overDisplay.text = "OVERS " + numberOfOvers + "." + numberOfBalls;
         if (firstInnings)
         {
-            runDisplayText.text = "IND " + totalRuns + "/" + wicketsGone;
+            runDisplayText.text = "IND " + firstInningRuns + "/" + wicketsGone;
         }
         else
         {
-            runDisplayText.text = "PAK " + totalRuns + "/" + wicketsGone;
+            runDisplayText.text = "PAK " + secondInningRuns + "/" + wicketsGone;
         }
         strikerDisplay.text = "Batsman" + striker + " " + strikerRuns;
         nonStrikerDisplay.text = "Batsman" + nonStriker + " " + nonStrikerRuns;
@@ -72,6 +89,8 @@ public class GameManager : MonoBehaviour {
             wicketFall();
         }
         numberOfBalls++;
+        Debug.Log("Wickets gone " + wicketsGone);
+        Debug.Log("Number of overs " + numberOfOvers);
 
         //Check for an over
         calculateOvers();
@@ -81,8 +100,7 @@ public class GameManager : MonoBehaviour {
     {
         if(wicketsGone==10 || numberOfOvers==20)
         {
-            inningsBreak = true;
-            return inningsBreak;
+            return true;
         }
         return false;
     }
@@ -120,6 +138,29 @@ public class GameManager : MonoBehaviour {
         //Increment strikers runs
         strikerRuns += nextBallScore;
         //Increment total score by the runs scored in this ball
-        totalRuns += nextBallScore;
+        if (firstInnings)
+        {
+            firstInningRuns += nextBallScore;
+        }
+        else
+        {
+            secondInningRuns += nextBallScore;
+        }
+    }
+
+    //Public static so that score manager can acces this function
+    public static int getFirstInningRuns()
+    {
+        return firstInningRuns;
+    }
+
+    public static int getSecondInningRuns()
+    {
+        return secondInningRuns;
+    }
+
+    void gameOver()
+    {
+        Application.LoadLevel("03A_WIN");
     }
 }
