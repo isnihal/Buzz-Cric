@@ -4,28 +4,56 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    static int numberOfOvers, numberOfBalls, totalRuns, wicketsGone, striker, nonStriker,nextBatsman,strikerRuns,nonStrikerRuns;
+    static int numberOfOvers, numberOfBalls, totalRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns, nonStrikerRuns;
     int nextBallScore;
-    public Text ballDisplay,strikerDisplay,nonStrikerDisplay,overDisplay,runDisplayText;
+    public Text ballDisplay, strikerDisplay, nonStrikerDisplay, overDisplay, runDisplayText;
+    bool inningsBreak,firstInnings;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
+        firstInnings = true;
+        inningsBreak = false;
+        resetGameVariables();
+	}
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        setScoreBoards();
+        if(InningsBreak())
+        {
+            firstInnings = false;
+            resetGameVariables();
+        }
+    }
+
+    void resetGameVariables()
+    {
+        inningsBreak = false;
         numberOfOvers = 0;
         numberOfBalls = 0;
         totalRuns = 0;
         strikerRuns = 0;
         nonStrikerRuns = 0;
         wicketsGone = 0;
+        ballDisplay.text = "-";
         striker = 1;
         nonStriker = 2;
         nextBatsman = 3;
-	}
+    }
 
-    // Update is called once per frame
-    void Update()
+    void setScoreBoards()
     {
         overDisplay.text = "OVERS " + numberOfOvers + "." + numberOfBalls;
-        runDisplayText.text = "IND " + totalRuns + "/" + wicketsGone;
+        if (firstInnings)
+        {
+            runDisplayText.text = "IND " + totalRuns + "/" + wicketsGone;
+        }
+        else
+        {
+            runDisplayText.text = "PAK " + totalRuns + "/" + wicketsGone;
+        }
         strikerDisplay.text = "Batsman" + striker + " " + strikerRuns;
         nonStrikerDisplay.text = "Batsman" + nonStriker + " " + nonStrikerRuns;
     }
@@ -47,6 +75,16 @@ public class GameManager : MonoBehaviour {
 
         //Check for an over
         calculateOvers();
+    }
+    
+    bool InningsBreak()
+    {
+        if(wicketsGone==10 || numberOfOvers==20)
+        {
+            inningsBreak = true;
+            return inningsBreak;
+        }
+        return false;
     }
 
     void calculateOvers()
