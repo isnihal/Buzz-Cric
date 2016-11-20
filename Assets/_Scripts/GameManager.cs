@@ -19,13 +19,14 @@ public class GameManager : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        setScoreBoards();
-
         //Check for 1st innings break(All out or 20 overs)
-        if (InningsBreak())
+        if (firstInnings)
         {
-            firstInnings = false;
-            resetGameVariables();
+            if (InningsBreak())
+            {
+                firstInnings = false;
+                resetGameVariables();
+            }
         }
 
         //Check for 2nd innings break
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour {
                 gameOver();
             }
         }
+        setScoreBoards();
     }
 
     void resetGameVariables()
