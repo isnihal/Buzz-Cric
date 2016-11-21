@@ -4,27 +4,34 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    static int numberOfOvers, numberOfBalls,firstInningRuns,secondInningRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns, nonStrikerRuns;
+    static int numberOfOvers, numberOfBalls,firstInningRuns,secondInningRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns, nonStrikerRuns,targetRuns,totalOvers,totalBalls;
     int nextBallScore;
-    public Text ballDisplay, strikerDisplay, nonStrikerDisplay, overDisplay, runDisplayText;
+    public Text ballDisplay, strikerDisplay, nonStrikerDisplay, overDisplay, runDisplayText,targetText;
     bool firstInnings;
 
     // Use this for initialization
     void Start () {
         firstInnings = true;
+        targetRuns = -1;
         resetGameVariables();
+
+        totalOvers = 20;
+        totalBalls = 120;
 	}
 
 
     // Update is called once per frame
     void Update()
     {
+        setScoreBoards();
+
         //Check for 1st innings break(All out or 20 overs)
         if (firstInnings)
         {
             if (InningsBreak())
             {
                 firstInnings = false;
+                targetRuns = firstInningRuns + 1;
                 resetGameVariables();
             }
         }
@@ -38,7 +45,6 @@ public class GameManager : MonoBehaviour {
                 gameOver();
             }
         }
-        setScoreBoards();
     }
 
     void resetGameVariables()
@@ -73,8 +79,14 @@ public class GameManager : MonoBehaviour {
         {
             runDisplayText.text = "PAK " + secondInningRuns + "/" + wicketsGone;
         }
-        strikerDisplay.text = "Batsman" + striker + " " + strikerRuns;
-        nonStrikerDisplay.text = "Batsman" + nonStriker + " " + nonStrikerRuns;
+        strikerDisplay.text = "Batsman " + striker + " " + strikerRuns;
+        nonStrikerDisplay.text = "Batsman " + nonStriker + " " + nonStrikerRuns;
+
+        //Set runs to win only in second innings
+        if(!firstInnings)
+        {
+            targetText.text = "TO WIN " + (targetRuns-secondInningRuns);
+        }
     }
 
 
@@ -91,8 +103,6 @@ public class GameManager : MonoBehaviour {
             wicketFall();
         }
         numberOfBalls++;
-        Debug.Log("Wickets gone " + wicketsGone);
-        Debug.Log("Number of overs " + numberOfOvers);
 
         //Check for an over
         calculateOvers();
@@ -103,6 +113,15 @@ public class GameManager : MonoBehaviour {
         if(wicketsGone==10 || numberOfOvers==20)
         {
             return true;
+        }
+
+        //Check only in second innings,if target is chased
+        if(!firstInnings)
+        {
+            if(secondInningRuns>=targetRuns)
+            {
+                return true;
+            }
         }
         return false;
     }
@@ -139,6 +158,15 @@ public class GameManager : MonoBehaviour {
         ballDisplay.text = nextBallScore.ToString();
         //Increment strikers runs
         strikerRuns += nextBallScore;
+        if(nextBallScore%2==1)
+        {
+            int swap = striker;
+            striker = nonStriker;
+            nonStriker = swap;
+            swap = strikerRuns;
+            strikerRuns = nonStrikerRuns;
+            nonStrikerRuns = swap;
+        }
         //Increment total score by the runs scored in this ball
         if (firstInnings)
         {
