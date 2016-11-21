@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour {
     int nextBallScore;
     public Text ballDisplay, strikerDisplay, nonStrikerDisplay, overDisplay, runDisplayText,targetText;
     bool firstInnings;
+    string firstBattingTeam, secondBattingTeam;
 
     // Use this for initialization
     void Start () {
@@ -17,6 +18,9 @@ public class GameManager : MonoBehaviour {
 
         totalOvers = 20;
         totalBalls = 120;
+
+        firstBattingTeam = TossManager.getFirstBatter();
+        secondBattingTeam = TossManager.getSecondBatter();
 	}
 
 
@@ -73,14 +77,16 @@ public class GameManager : MonoBehaviour {
         overDisplay.text = "OVERS " + numberOfOvers + "." + numberOfBalls;
         if (firstInnings)
         {
-            runDisplayText.text = TossManager.getFirstBatter() + " " + firstInningRuns + "/" + wicketsGone;
+            runDisplayText.text = firstBattingTeam + " " + firstInningRuns + "/" + wicketsGone;
+            strikerDisplay.text = TeamManager.getBatsman(firstBattingTeam,striker) + " " + strikerRuns+"*";
+            nonStrikerDisplay.text = TeamManager.getBatsman(firstBattingTeam, nonStriker) + " " + nonStrikerRuns;
         }
         else
         {
-            runDisplayText.text = TossManager.getSecondBatter() + " " + secondInningRuns + "/" + wicketsGone;
+            runDisplayText.text = secondBattingTeam + " " + secondInningRuns + "/" + wicketsGone;
+            strikerDisplay.text = TeamManager.getBatsman(secondBattingTeam, striker) + " " + strikerRuns+"*";
+            nonStrikerDisplay.text = TeamManager.getBatsman(secondBattingTeam, nonStriker)+" " + nonStrikerRuns;
         }
-        strikerDisplay.text = "Batsman " + striker + " " + strikerRuns;
-        nonStrikerDisplay.text = "Batsman " + nonStriker + " " + nonStrikerRuns;
 
         //Set runs to win only in second innings
         if(!firstInnings)
