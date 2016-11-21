@@ -1,0 +1,101 @@
+﻿using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
+public class TossManager : MonoBehaviour {
+
+    int tossResult;
+    string playerAction;
+    static string firstBatter,secondBatter;
+    public Text resultText, battingText, bowlingText, playButton;
+    static bool hasTossFinished,hasUserDecided;
+
+    void Start()
+    {
+        hasTossFinished = false;
+        hasUserDecided = false;
+    }
+
+    public void tossCoin(string userChoice)
+    {
+        if (!hasTossFinished)
+        {
+            //0 for heads 1 for tails
+            Dictionary<int, string> tossResultInString = new Dictionary<int, string>();
+            tossResultInString.Add(0, "HEADS");
+            tossResultInString.Add(1, "TAILS");
+            tossResult = Random.Range(0, 2);
+            Debug.Log(tossResult + "");
+            if (tossResultInString[tossResult] == userChoice)
+            {
+                //User won the toss
+                resultText.text = "YOU WON";
+                battingText.text = "BATTING";
+                bowlingText.text = "BOWLING";
+            }
+            else
+            {
+                int randomChoice = Random.Range(0, 2);
+                if (randomChoice == 0)
+                {
+                    //Opponent chooses batting
+                    resultText.text = "YOU LOST\n\nVISITORS BATTING";
+                    firstBatter = "PAK";
+                    secondBatter = "IND";
+                }
+                else
+                {
+                    //Opponent chooses bowling
+                    resultText.text = "YOU LOST\n\nVISITORS BOWLING";
+                    firstBatter = "IND";
+                    secondBatter = "PAK";
+                }
+                playButton.text = "PLAY";
+                //Opponent won the toss,so user do not have to decide
+                hasUserDecided = true;
+            }
+            hasTossFinished = true;
+        }
+    }
+
+    public void chooseAction(string battingOrBowling)
+    {
+        if (!hasUserDecided)
+        {
+            playerAction = battingOrBowling;
+            if (playerAction == "BATTING")
+            {
+                resultText.text = "YOU CHOOSE BATTING";
+                firstBatter = "IND";
+                secondBatter = "PAK";
+            }
+            else if (playerAction == "BOWLING")
+            {
+                resultText.text = "YOU CHOOSE BOWLING";
+                firstBatter = "PAK";
+                secondBatter = "IND";
+            }
+            playButton.text = "PLAY";
+            hasUserDecided = true;
+        }
+    }
+
+    public static string getFirstBatter()
+    {
+        return firstBatter;
+    }
+
+    public static string getSecondBatter()
+    {
+        return secondBatter;
+    }
+
+    public void startGame()
+    {
+        if(hasUserDecided && hasTossFinished)
+        {
+            Application.LoadLevel("02E_GAME");
+        }
+    }
+}

@@ -73,11 +73,11 @@ public class GameManager : MonoBehaviour {
         overDisplay.text = "OVERS " + numberOfOvers + "." + numberOfBalls;
         if (firstInnings)
         {
-            runDisplayText.text = "IND " + firstInningRuns + "/" + wicketsGone;
+            runDisplayText.text = TossManager.getFirstBatter() + " " + firstInningRuns + "/" + wicketsGone;
         }
         else
         {
-            runDisplayText.text = "PAK " + secondInningRuns + "/" + wicketsGone;
+            runDisplayText.text = TossManager.getSecondBatter() + " " + secondInningRuns + "/" + wicketsGone;
         }
         strikerDisplay.text = "Batsman " + striker + " " + strikerRuns;
         nonStrikerDisplay.text = "Batsman " + nonStriker + " " + nonStrikerRuns;

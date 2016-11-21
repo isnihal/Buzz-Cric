@@ -13,13 +13,13 @@ public class ScoreManager : MonoBehaviour {
         secondInningRuns = GameManager.getSecondInningRuns();
         if(firstInningRuns>secondInningRuns)
         {
-            winnerName.text = "IND WINS";
+            winnerName.text = TossManager.getFirstBatter()+" WINS";
         }
         else
         {
-            winnerName.text = "PAK WINS";
+            winnerName.text = TossManager.getSecondBatter()+" WINS";
         }
-        firstTeamText.text = "IND " + firstInningRuns;
-        secondTeamText.text = "PAK " + secondInningRuns;
+        firstTeamText.text = TossManager.getFirstBatter() + " " + firstInningRuns;
+        secondTeamText.text = TossManager.getSecondBatter() + " " + secondInningRuns;
     }
 }
