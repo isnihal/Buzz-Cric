@@ -46,6 +46,7 @@ public class TeamManager : MonoBehaviour {
             if (flagIndex == getHomeTeamIndex())
             {
                 flagIndex++;
+                Debug.Log(flagIndex);
             }
         }
 
@@ -62,13 +63,11 @@ public class TeamManager : MonoBehaviour {
     {
         homeTeam =teamName[flagIndex];
         homeTeamIndex = flagIndex;
-        Debug.Log("Home team " + homeTeam);
     }
 
     public void chooseAwayTeam()
     {
         awayTeam =teamName[flagIndex];
-        Debug.Log("Away team " + awayTeam);
     }
 
     public void increaseFlagIndex()
@@ -92,6 +91,7 @@ public class TeamManager : MonoBehaviour {
                 {
                       flagIndex++;
                 }
+                Debug.Log(flagIndex);
             }
         }
         chooseTeam();
