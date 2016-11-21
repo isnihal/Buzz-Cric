@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class TossManager : MonoBehaviour {
 
     int tossResult;
-    string playerAction;
+    string playerAction,homeTeam,awayTeam;
     static string firstBatter,secondBatter;
     public Text resultText, battingText, bowlingText, playButton;
     static bool hasTossFinished,hasUserDecided;
@@ -15,6 +15,8 @@ public class TossManager : MonoBehaviour {
     {
         hasTossFinished = false;
         hasUserDecided = false;
+        homeTeam = TeamManager.getHomeTeam();
+        awayTeam = TeamManager.getAwayTeam(); 
     }
 
     public void tossCoin(string userChoice)
@@ -41,15 +43,15 @@ public class TossManager : MonoBehaviour {
                 {
                     //Opponent chooses batting
                     resultText.text = "YOU LOST\n\nVISITORS BATTING";
-                    firstBatter = "PAK";
-                    secondBatter = "IND";
+                    firstBatter = awayTeam;
+                    secondBatter = homeTeam;
                 }
                 else
                 {
                     //Opponent chooses bowling
                     resultText.text = "YOU LOST\n\nVISITORS BOWLING";
-                    firstBatter = "IND";
-                    secondBatter = "PAK";
+                    firstBatter = homeTeam;
+                    secondBatter = awayTeam;
                 }
                 playButton.text = "PLAY";
                 //Opponent won the toss,so user do not have to decide
@@ -67,14 +69,14 @@ public class TossManager : MonoBehaviour {
             if (playerAction == "BATTING")
             {
                 resultText.text = "YOU CHOOSE BATTING";
-                firstBatter = "IND";
-                secondBatter = "PAK";
+                firstBatter = homeTeam;
+                secondBatter = awayTeam;
             }
             else if (playerAction == "BOWLING")
             {
                 resultText.text = "YOU CHOOSE BOWLING";
-                firstBatter = "PAK";
-                secondBatter = "IND";
+                firstBatter = awayTeam;
+                secondBatter = homeTeam;
             }
             playButton.text = "PLAY";
             hasUserDecided = true;
