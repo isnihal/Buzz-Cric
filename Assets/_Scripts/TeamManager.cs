@@ -6,14 +6,38 @@ public class TeamManager : MonoBehaviour {
 
     public Sprite[] teamFlags;
     public Image teamFlagDisplay;
+    public Text teamNameDisplay;
     int flagIndex;
     static int homeTeamIndex;
     static string homeTeam, awayTeam;
 
     Dictionary<int, string> teamName = new Dictionary<int, string>();
+    Dictionary<int, string> fullTeamName = new Dictionary<int, string>();
 
     void Start()
     {
+        //Setting up of team with respect to flagIndex
+        teamName.Add(0, "IND");
+        teamName.Add(1, "AUS");
+        teamName.Add(2, "ENG");
+        teamName.Add(3, "RSA");
+        teamName.Add(4, "NZ");
+        teamName.Add(5, "PAK");
+        teamName.Add(6, "SL");
+        teamName.Add(7, "WI");
+        teamName.Add(8, "ZIM");
+        teamName.Add(9, "IRE");
+
+        fullTeamName.Add(0, "INDIA");
+        fullTeamName.Add(1, "AUSTRALIA");
+        fullTeamName.Add(2, "ENGLAND");
+        fullTeamName.Add(3, "SOUTH AFRICA");
+        fullTeamName.Add(4, "NEW ZEALAND");
+        fullTeamName.Add(5, "PAKISTAN");
+        fullTeamName.Add(6, "SRI LANKA");
+        fullTeamName.Add(7, "WEST INDIES");
+        fullTeamName.Add(8, "ZIMBAVE");
+        fullTeamName.Add(9, "IRELAND");
         flagIndex = 0;
 
         //To avoid home team being away team,Level 3 indicates the level 02B_AWAY
@@ -26,23 +50,12 @@ public class TeamManager : MonoBehaviour {
         }
 
         chooseTeam();
-
-        //Setting up of team with respect to flagIndex
-        teamName.Add(0, "IND");
-        teamName.Add(1, "AUS");
-        teamName.Add(2, "ENG");
-        teamName.Add(3, "RSA");
-        teamName.Add(4, "NZ");
-        teamName.Add(5, "PAK");
-        teamName.Add(6, "SL");
-        teamName.Add(7, "WI");
-        teamName.Add(8, "ZIM");
-        teamName.Add(9, "IRE");
     }
 
     void chooseTeam()
     {
             teamFlagDisplay.sprite = teamFlags[flagIndex];
+            teamNameDisplay.text = fullTeamName[flagIndex];
     }
 
     public void chooseHomeTeam()
