@@ -4,7 +4,7 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    static int numberOfOvers, numberOfBalls,firstInningRuns,secondInningRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns, nonStrikerRuns,targetRuns,totalOvers,totalBalls;
+    static int numberOfOvers, numberOfBalls,firstInningRuns,secondInningRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns,                      nonStrikerRuns,targetRuns,totalOvers,totalBalls;
     int nextBallScore;
     public Text ballDisplay, strikerDisplay, nonStrikerDisplay, overDisplay, runDisplayText,targetText;
     bool firstInnings;
@@ -16,8 +16,8 @@ public class GameManager : MonoBehaviour {
         targetRuns = -1;
         resetGameVariables();
 
-        totalOvers = 20;
-        totalBalls = 120;
+        totalOvers = SettingsManager.getNumberOfOvers();
+        totalBalls = totalOvers*6;
 
         firstBattingTeam = TossManager.getFirstBatter();
         secondBattingTeam = TossManager.getSecondBatter();
@@ -116,7 +116,7 @@ public class GameManager : MonoBehaviour {
     
     bool InningsBreak()
     {
-        if(wicketsGone==10 || numberOfOvers==20)
+        if(wicketsGone==10 || numberOfOvers==totalOvers)
         {
             return true;
         }
