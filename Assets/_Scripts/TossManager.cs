@@ -21,7 +21,7 @@ public class TossManager : MonoBehaviour {
 
     public void tossCoin(string userChoice)
     {
-        if (!hasTossFinished)
+        if (!hasTossFinished)//Ensures that toss is performed only once
         {
             //0 for heads 1 for tails
             Dictionary<int, string> tossResultInString = new Dictionary<int, string>();
@@ -63,6 +63,8 @@ public class TossManager : MonoBehaviour {
 
     public void chooseAction(string battingOrBowling)
     {
+        //This function is called only if user wins the toss
+        //User has options to choose batting or bowling
         if (!hasUserDecided)
         {
             playerAction = battingOrBowling;

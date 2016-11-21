@@ -13,12 +13,16 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         firstInnings = true;
+        //No target to chase in firstInnings,-1 because 0 will cause bug
         targetRuns = -1;
+        //Variables like numberOfOvers,runs etc are set to zero at the begining
         resetGameVariables();
 
+        //Overs as per the will of the user
         totalOvers = SettingsManager.getNumberOfOvers();
         totalBalls = totalOvers*6;
 
+        //Get names of first and second batting teams from TossManager
         firstBattingTeam = TossManager.getFirstBatter();
         secondBattingTeam = TossManager.getSecondBatter();
 	}
@@ -45,7 +49,6 @@ public class GameManager : MonoBehaviour {
         {
             if (InningsBreak())
             {
-                Debug.Log("Game Over");
                 gameOver();
             }
         }
@@ -72,6 +75,7 @@ public class GameManager : MonoBehaviour {
         nextBatsman = 3;
     }
 
+    //Set the various Text Display
     void setScoreBoards()
     {
         overDisplay.text = "OVERS " + numberOfOvers + "." + numberOfBalls;
@@ -98,6 +102,7 @@ public class GameManager : MonoBehaviour {
 
     public void nextBall()
     {
+        //Basic difficulty
         //Generate runs between 0-6(5 is given as wicket)
         nextBallScore = Random.RandomRange(0, 7);
         if (nextBallScore != 5)
@@ -154,6 +159,7 @@ public class GameManager : MonoBehaviour {
         ballDisplay.text = "W";
         wicketsGone++;
         striker = nextBatsman;
+        //After first wicket nextBatsman index changes from 3(inital) to 4 and so on
         nextBatsman++;
         strikerRuns = 0;
     }
@@ -166,6 +172,7 @@ public class GameManager : MonoBehaviour {
         strikerRuns += nextBallScore;
         if(nextBallScore%2==1)
         {
+            //Strike rotation if run scored is a 1 or 3
             int swap = striker;
             striker = nonStriker;
             nonStriker = swap;

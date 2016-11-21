@@ -28,6 +28,7 @@ public class TeamManager : MonoBehaviour {
         teamName.Add(8, "ZIM");
         teamName.Add(9, "IRE");
 
+        //Full names of teams with respect to flagIndex
         fullTeamName.Add(0, "INDIA");
         fullTeamName.Add(1, "AUSTRALIA");
         fullTeamName.Add(2, "ENGLAND");
@@ -40,7 +41,7 @@ public class TeamManager : MonoBehaviour {
         fullTeamName.Add(9, "IRELAND");
         flagIndex = 0;
 
-        //To avoid home team being away team,Level 3 indicates the level 02B_AWAY
+        //To avoid home team same as away team,Level 3 indicates the level 02B_AWAY
         if (Application.loadedLevel == 3)
         {
             if (flagIndex == getHomeTeamIndex())
@@ -55,19 +56,23 @@ public class TeamManager : MonoBehaviour {
 
     void chooseTeam()
     {
+            //Display the flag
             teamFlagDisplay.sprite = teamFlags[flagIndex];
+            //Display team name
             teamNameDisplay.text = fullTeamName[flagIndex];
     }
 
     public void chooseHomeTeam()
     {
+        //Function responsible for choosing the home team
         homeTeam =teamName[flagIndex];
         homeTeamIndex = flagIndex;
     }
 
     public void chooseAwayTeam()
     {
-        awayTeam =teamName[flagIndex];
+        //Function responsible for choosing the away team
+        awayTeam = teamName[flagIndex];
     }
 
     public void increaseFlagIndex()
@@ -81,6 +86,7 @@ public class TeamManager : MonoBehaviour {
                 flagIndex++;
             }
         }
+        //To check flagIndex never goes beyong length of array,If so change index back to zero
         if (flagIndex>teamFlags.Length-1)
             {
                 flagIndex = 0;
@@ -108,12 +114,14 @@ public class TeamManager : MonoBehaviour {
                 flagIndex--;
             }
         }
+        //To check flagIndex never goes less than the length of array,If so change index back to maximum index
         if (flagIndex<0)
         {
             flagIndex = teamFlags.Length-1;
         }
         chooseTeam();
     }
+
 
     public static string getHomeTeam()
     {
@@ -132,6 +140,10 @@ public class TeamManager : MonoBehaviour {
 
     public static string getBatsman(string team,int number)
     {
+
+        //Edit Teams Here
+
+        //India
         if (team == "IND")
         {
             switch (number)
@@ -150,6 +162,7 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
+        //Australia
         else if (team == "AUS")
         {
             switch (number)
@@ -168,6 +181,7 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
+        //England
         else if (team == "ENG")
         {
             switch (number)
@@ -186,6 +200,7 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
+        //South Africa
         else if (team == "RSA")
         {
             switch (number)
@@ -204,6 +219,7 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
+        //New Zealand
         else if (team == "NZ")
         {
             switch (number)
@@ -222,6 +238,7 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
+        //Pakistan
         else if (team == "PAK")
         {
             switch (number)
@@ -240,7 +257,7 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
-
+        //Sri Lanka
         else if (team == "SL")
         {
             switch (number)
@@ -259,6 +276,7 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
+        //West Indies
         else if (team == "WI")
         {
             switch (number)
@@ -277,24 +295,8 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
-        else if (team == "WI")
-        {
-            switch (number)
-            {
-                case 1: return "Gayle";
-                case 2: return "Charles";
-                case 3: return "Samulels";
-                case 4: return "Bravo";
-                case 5: return "Pollard";
-                case 6: return "Ramdin";
-                case 7: return "Sammy";
-                case 8: return "Narine";
-                case 9: return "Holder";
-                case 10: return "Ben";
-                case 11: return "Roach";
-            }
-        }
 
+        //Zimbave
         else if(team=="ZIM")
         {
             switch (number)
@@ -313,6 +315,8 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
+
+        //Ireland
         else if(team=="IRE")
         {
             switch (number)
