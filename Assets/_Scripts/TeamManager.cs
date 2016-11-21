@@ -7,6 +7,7 @@ public class TeamManager : MonoBehaviour {
     public Sprite[] teamFlags;
     public Image teamFlagDisplay;
     int flagIndex;
+    static int homeTeamIndex;
     static string homeTeam, awayTeam;
 
     Dictionary<int, string> teamName = new Dictionary<int, string>();
@@ -14,8 +15,17 @@ public class TeamManager : MonoBehaviour {
     void Start()
     {
         flagIndex = 0;
-        chooseTeam();
 
+        //To avoid home team being away team,Level 3 indicates the level 02B_AWAY
+        if (Application.loadedLevel == 3)
+        {
+            if (flagIndex == getHomeTeamIndex())
+            {
+                flagIndex++;
+            }
+        }
+
+        chooseTeam();
 
         //Setting up of team with respect to flagIndex
         teamName.Add(0, "IND");
@@ -38,6 +48,7 @@ public class TeamManager : MonoBehaviour {
     public void chooseHomeTeam()
     {
         homeTeam =teamName[flagIndex];
+        homeTeamIndex = flagIndex;
         Debug.Log("Home team " + homeTeam);
     }
 
@@ -50,9 +61,25 @@ public class TeamManager : MonoBehaviour {
     public void increaseFlagIndex()
     {
         flagIndex++;
-        if(flagIndex>teamFlags.Length-1)
+        //To avoid home team being away team,Level 3 indicates the level 02B_AWAY
+        if (Application.loadedLevel == 3)
         {
-            flagIndex = 0;
+            if (flagIndex == getHomeTeamIndex())
+            {
+                flagIndex++;
+            }
+        }
+        if (flagIndex>teamFlags.Length-1)
+            {
+                flagIndex = 0;
+            //To avoid home team being away team,Level 3 indicates the level 02B_AWAY
+            if (Application.loadedLevel == 3)
+                {
+                if (flagIndex == getHomeTeamIndex())
+                {
+                      flagIndex++;
+                }
+            }
         }
         chooseTeam();
     }
@@ -60,6 +87,14 @@ public class TeamManager : MonoBehaviour {
     public void decreaseFlagIndex()
     {
         flagIndex--;
+        //To avoid home team being away team,Level 3 indicates the level 02B_AWAY
+        if (Application.loadedLevel == 3)
+        {
+            if (flagIndex == getHomeTeamIndex())
+            {
+                flagIndex--;
+            }
+        }
         if (flagIndex<0)
         {
             flagIndex = teamFlags.Length-1;
@@ -70,6 +105,11 @@ public class TeamManager : MonoBehaviour {
     public static string getHomeTeam()
     {
         return homeTeam;
+    }
+
+    public static int getHomeTeamIndex()
+    {
+        return homeTeamIndex;
     }
 
     public static string getAwayTeam()
