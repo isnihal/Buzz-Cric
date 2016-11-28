@@ -4,15 +4,15 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
-    static int numberOfOvers, numberOfBalls,firstInningRuns,secondInningRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns,                      nonStrikerRuns,targetRuns,totalOvers,totalBalls;
-    int nextBallScore;
-    public Text ballDisplay, strikerDisplay, nonStrikerDisplay, overDisplay, runDisplayText,targetText;
-    bool firstInnings;
+    static int numberOfOvers, numberOfBalls,firstInningRuns,secondInningRuns, wicketsGone, striker, nonStriker, nextBatsman, strikerRuns,                      nonStrikerRuns,targetRuns,totalOvers,totalBalls,nextBallScore;
+    public Text strikerDisplay, nonStrikerDisplay, overDisplay, runDisplayText,targetText;
+    static bool firstInnings,hasRotationFinished;
     string firstBattingTeam, secondBattingTeam;
 
     // Use this for initialization
     void Start () {
         firstInnings = true;
+        hasRotationFinished = false;
         //No target to chase in firstInnings,-1 because 0 will cause bug
         targetRuns = -1;
         //Variables like numberOfOvers,runs etc are set to zero at the begining
@@ -52,6 +52,9 @@ public class GameManager : MonoBehaviour {
                 gameOver();
             }
         }
+
+        //Works only if rotation of wheel finishes
+        nextBall();
     }
 
     void resetGameVariables()
@@ -69,7 +72,6 @@ public class GameManager : MonoBehaviour {
         strikerRuns = 0;
         nonStrikerRuns = 0;
         wicketsGone = 0;
-        ballDisplay.text = "-";
         striker = 1;
         nonStriker = 2;
         nextBatsman = 3;
@@ -99,12 +101,13 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-
+   
     public void nextBall()
     {
-        //Basic difficulty
-        //Generate runs between 0-6(5 is given as wicket)
-        nextBallScore = Random.RandomRange(0, 7);
+        //Ensure that next ball is delivered only after rotation of wheel stops
+        if (!hasRotationFinished)
+            return;
+
         if (nextBallScore != 5)
         {
             scoreRun();
@@ -117,8 +120,17 @@ public class GameManager : MonoBehaviour {
 
         //Check for an over
         calculateOvers();
+
+        //Reset rotation of wheel condition for next ball
+        hasRotationFinished = false;
     }
-    
+
+    public static void setNextBallScore(int runs)
+    {
+        nextBallScore = runs;
+        hasRotationFinished = true;
+    }
+
     bool InningsBreak()
     {
         if(wicketsGone==10 || numberOfOvers==totalOvers)
@@ -156,7 +168,6 @@ public class GameManager : MonoBehaviour {
 
     void wicketFall()
     {
-        ballDisplay.text = "W";
         wicketsGone++;
         striker = nextBatsman;
         //After first wicket nextBatsman index changes from 3(inital) to 4 and so on
@@ -164,10 +175,8 @@ public class GameManager : MonoBehaviour {
         strikerRuns = 0;
     }
 
-    void scoreRun()
+     void scoreRun()
     {
-        //Set main display to runs scored in this ball
-        ballDisplay.text = nextBallScore.ToString();
         //Increment strikers runs
         strikerRuns += nextBallScore;
         if(nextBallScore%2==1)
@@ -206,4 +215,7 @@ public class GameManager : MonoBehaviour {
     {
         Application.LoadLevel("03A_WIN");
     }
+
+
+
 }

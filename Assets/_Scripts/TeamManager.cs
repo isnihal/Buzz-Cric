@@ -47,7 +47,6 @@ public class TeamManager : MonoBehaviour {
             if (flagIndex == getHomeTeamIndex())
             {
                 flagIndex++;
-                Debug.Log(flagIndex);
             }
         }
 
