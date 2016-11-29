@@ -28,7 +28,6 @@ public class TossManager : MonoBehaviour {
             tossResultInString.Add(0, "HEADS");
             tossResultInString.Add(1, "TAILS");
             tossResult = Random.Range(0, 2);
-            Debug.Log(tossResult + "");
             if (tossResultInString[tossResult] == userChoice)
             {
                 //User won the toss

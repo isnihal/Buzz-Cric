@@ -12,6 +12,16 @@ public class FortuneWheelManager : MonoBehaviour
     public Button TurnButton;
     public GameObject Circle; 			// Rotatable Object with rewards
 
+    //Swipe control variables
+    Vector3 startPosition, endPosition;
+    float swipeHeight, minimumSwipeHeight;
+
+    void Start()
+    {
+        //Higher the value,Longer will be minimum swipe height
+        minimumSwipeHeight = 45f;
+    }
+
 
     public static void GiveAwardByAngle ()
     {
@@ -88,5 +98,20 @@ public class FortuneWheelManager : MonoBehaviour
         
         //Start the rotation
         isStarted = true;
+    }
+
+    public void dragStart()
+    {
+        startPosition = Input.mousePosition;
+    }
+
+    public void dragEnd()
+    {
+        endPosition = Input.mousePosition;
+        swipeHeight = startPosition.y - endPosition.y;
+        if(swipeHeight>=minimumSwipeHeight)
+        {
+            Invoke("TurnWheel",0.0000001f);//2nd argument is time delay to execute function,0 causes bug
+        }
     }
 }
