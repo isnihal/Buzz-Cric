@@ -11,10 +11,11 @@ public class ScoreManager : MonoBehaviour {
     {
         firstInningRuns = GameManager.getFirstInningRuns();
         secondInningRuns = GameManager.getSecondInningRuns();
-        if(firstInningRuns>secondInningRuns)
-        {
-            winnerName.text = TossManager.getFirstBatter()+" WINS";
-        }
+		if (firstInningRuns > secondInningRuns) {
+			winnerName.text = TossManager.getFirstBatter () + " WINS";
+		} else if (firstInningRuns == secondInningRuns) {
+			winnerName.text = "MATCH DRAWN";
+		}
         else
         {
             winnerName.text = TossManager.getSecondBatter()+" WINS";

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 
 public class TeamManager : MonoBehaviour {
 
-    public Sprite[] teamFlags;
-    public Image teamFlagDisplay;
-    public Text teamNameDisplay;
+	//Choose Home and Away teams,Return team names,Return batsmen.
+
+    public Sprite[] teamFlags;//Image array to store team flags
+    public Image teamFlagDisplay;//Display board
+    public Text teamNameDisplay;//Team name display board
     int flagIndex;
     static int homeTeamIndex;
-    static string homeTeam, awayTeam;
+    static string homeTeam, awayTeam;//Strings to store home and away teams
 
     Dictionary<int, string> teamName = new Dictionary<int, string>();
     Dictionary<int, string> fullTeamName = new Dictionary<int, string>();
@@ -50,7 +52,7 @@ public class TeamManager : MonoBehaviour {
             }
         }
 
-        chooseTeam();
+        chooseTeam();//Defnition below
     }
 
     void chooseTeam()
@@ -61,7 +63,7 @@ public class TeamManager : MonoBehaviour {
             teamNameDisplay.text = fullTeamName[flagIndex];
     }
 
-    public void chooseHomeTeam()
+    public void chooseHomeTeam()//Executes when next button is clicked
     {
         //Function responsible for choosing the home team
         homeTeam =teamName[flagIndex];

@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class FortuneWheelManager : MonoBehaviour
 {
-    private bool isStarted;
+    private bool isStarted;//isWheelRotating
     private float[] sectorsAngles;
     private float finalAngle;
     private static float startAngle = 0;

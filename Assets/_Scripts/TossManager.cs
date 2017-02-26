@@ -37,18 +37,18 @@ public class TossManager : MonoBehaviour {
             }
             else
             {
-                int randomChoice = Random.Range(0, 2);
+                int randomChoice = Random.Range(0, 2);//Let computer choose batting or bowling
                 if (randomChoice == 0)
                 {
                     //Opponent chooses batting
-                    resultText.text = "YOU LOST\n\nVISITORS BATTING";
+                    resultText.text = "YOU LOST\n\nOPPONENT BATTING";
                     firstBatter = awayTeam;
                     secondBatter = homeTeam;
                 }
                 else
                 {
                     //Opponent chooses bowling
-                    resultText.text = "YOU LOST\n\nVISITORS BOWLING";
+                    resultText.text = "YOU LOST\n\nOPPONENT BOWLING";
                     firstBatter = homeTeam;
                     secondBatter = awayTeam;
                 }
@@ -86,12 +86,12 @@ public class TossManager : MonoBehaviour {
 
     public static string getFirstBatter()
     {
-        return firstBatter;
+        return firstBatter;//Get first batting team
     }
 
     public static string getSecondBatter()
     {
-        return secondBatter;
+		return secondBatter;//Get second batting team
     }
 
     public void startGame()
