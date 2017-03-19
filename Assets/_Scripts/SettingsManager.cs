@@ -4,7 +4,7 @@ using System.Collections;
 
 public class SettingsManager : MonoBehaviour {
 
-    int[] overArray = { 5, 10, 15, 20 };
+    int[] overArray = { 5, 10, 15, 20 };//Set match type
     public Text overDisplay;
     int overIndex;
     static int numberOfOvers;

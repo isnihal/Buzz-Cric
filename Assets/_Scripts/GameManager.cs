@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour {
             }
         }
 
+		//If innings not finished
         //Works only if rotation of wheel finishes
         nextBall();
     }
