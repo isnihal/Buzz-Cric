@@ -11,6 +11,8 @@ namespace UnityEngine.Networking
 		[SerializeField] public bool showGUI = true;
 		[SerializeField] public int offsetX;
 		[SerializeField] public int offsetY;
+		[SerializeField] public GameObject quitButton,matchMakerButton,createInternetMatchButton,
+		findInternetMatchButton,stopMatchMakerButton;
 
 		// Runtime variable
 		bool showServer = false;
@@ -109,12 +111,12 @@ namespace UnityEngine.Networking
 
 			if (NetworkServer.active || NetworkClient.active)
 			{
-				/*if (GUI.Button(new Rect(xpos, 30, 200, 20), "QUIT"))
-				{
-					manager.StopHost();
-				}
-				ypos += spacing;
-				*/
+				//QUIT BUTTON BLOCK
+				quitButton.SetActive (true);
+				matchMakerButton.SetActive (false);
+				createInternetMatchButton.SetActive (false);
+				findInternetMatchButton.SetActive(false);
+				stopMatchMakerButton.SetActive (false);
 			}
 
 			if (!NetworkServer.active && !NetworkClient.active)
@@ -123,11 +125,12 @@ namespace UnityEngine.Networking
 
 				if (manager.matchMaker == null)
 				{
-					if (GUI.Button(new Rect(xpos, ypos, 200, 20), "Enable Match Maker (M)"))
-					{
-						manager.StartMatchMaker();
-					}
-					ypos += spacing;
+					//Match Maker Block
+					matchMakerButton.SetActive (true);
+					quitButton.SetActive (false);
+					createInternetMatchButton.SetActive (false);
+					findInternetMatchButton.SetActive(false);
+					stopMatchMakerButton.SetActive (false);
 				}
 				else
 				{
@@ -135,23 +138,23 @@ namespace UnityEngine.Networking
 					{
 						if (manager.matches == null)
 						{
-							if (GUI.Button(new Rect(xpos, ypos, 200, 20), "Create Internet Match"))
-							{
-								manager.matchMaker.CreateMatch(manager.matchName, manager.matchSize, true, "", manager.OnMatchCreate);
-							}
-							ypos += spacing;
+							//Create InternetNet match block
+							createInternetMatchButton.SetActive(true);
+							findInternetMatchButton.SetActive(true);
+							matchMakerButton.SetActive (false);
+							quitButton.SetActive (false);
 
-							GUI.Label(new Rect(xpos, ypos, 100, 20), "Room Name:");
-							manager.matchName = GUI.TextField(new Rect(xpos+100, ypos, 100, 20), manager.matchName);
-							ypos += spacing;
 
-							ypos += 10;
+							//Room name block
 
-							if (GUI.Button(new Rect(xpos, ypos, 200, 20), "Find Internet Match"))
-							{
-								manager.matchMaker.ListMatches(0,20, "", manager.OnMatchList);
-							}
-							ypos += spacing;
+							manager.matchName = "Buzz Cric";
+
+							//Find InternetMatchBlock
+							/*findInternetMatchButton.SetActive(true);
+							createInternetMatchButton.SetActive(true);
+							matchMakerButton.SetActive (false);
+							quitButton.SetActive (false);*/
+
 						}
 						else
 						{
@@ -194,18 +197,37 @@ namespace UnityEngine.Networking
 						}
 					}
 
-					//ypos += spacing;
-
-					//GUI.Label(new Rect(xpos, ypos, 300, 20), "MM Uri: " + manager.matchMaker.baseUri);
-					ypos += spacing;
-
-					if (GUI.Button(new Rect(xpos, ypos, 200, 20), "Disable Match Maker"))
-					{
-						manager.StopMatchMaker();
-					}
-					ypos += spacing;
+					//Stop MatchMaker
+					stopMatchMakerButton.SetActive(true);
 				}
 			}
+		}
+
+
+		//Implement QuitButton Functionality
+		public void quitButtonFunction()
+		{
+			manager.StopHost ();
+		}
+
+		public void matchMakerFunction()
+		{
+			manager.StartMatchMaker();
+		}
+
+		public void createInternetMatchFunction()
+		{
+			manager.matchMaker.CreateMatch(manager.matchName, manager.matchSize, true, "", manager.OnMatchCreate);
+		}
+
+		public void findInternetMatchFunction()
+		{
+			manager.matchMaker.ListMatches(0,20, "", manager.OnMatchList);
+		}
+
+		public void stopMatchMakerFunction()
+		{
+			manager.StopMatchMaker();
 		}
 	}
 };
