@@ -20,7 +20,7 @@ public class MultiplayerTeamManager : NetworkBehaviour {
 	Dictionary<int, string> fullTeamName = new Dictionary<int, string>();
 
 
-	public GameObject canvasDisable;
+	public GameObject canvasDisable,canvasWaiting;
 
 	void Start()
 	{
@@ -55,10 +55,7 @@ public class MultiplayerTeamManager : NetworkBehaviour {
 
 	void Update()
 	{
-		if (isLocalPlayer) {
-			canvasDisable.SetActive (true);
-		} else {
-			canvasDisable.SetActive (false);
-		}
+		canvasDisable.SetActive (false);
+		canvasWaiting.SetActive (false);
 	}
 }
