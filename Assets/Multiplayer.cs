@@ -22,7 +22,14 @@ public class Multiplayer : NetworkBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {		
+	void Update () {
+		if (isLocalPlayer) {
+			hostBoard.GetComponent<Text> ().text = run + "";
+		}
+
+		if (!isLocalPlayer) {
+			clientBoard.GetComponent<Text> ().text = run + "";
+		}
 	}
 
 	[Command]
