@@ -13,8 +13,7 @@ namespace UnityEngine.Networking
 		[SerializeField] public int offsetY;
 		GUIStyle guiStyle;
 
-		// Runtime variable
-		bool showServer = false;
+		public int guiWidth,guiHeight;
 
 		void Awake()
 		{
@@ -58,27 +57,20 @@ namespace UnityEngine.Networking
 			textField.fontSize = 50;
 			guiStyle.fontSize = 50;
 
-			// Load and set Font
+			//Load and set Font
 			Font myFont = (Font)Resources.Load("Fonts/comic", typeof(Font));
 			guiStyle.font = myFont;
 			if (!showGUI)
 				return;
 
-			int xpos = 100 + offsetX;
-			int ypos = 400 + offsetY;
-			int spacing = 110;
+			int xpos = 10 + offsetX;
+			int ypos = 40 + offsetY;
+			int spacing = 10;
 
-
-			if (!NetworkClient.active && !NetworkServer.active && manager.matchMaker == null)
-			{
-			}
-			else
-			{
-			}
 
 			if (NetworkClient.active && !ClientScene.ready)
 			{
-				if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Client Ready",guiStyle))
+				if (GUI.Button(new Rect(xpos, ypos, guiWidth, guiHeight), "Client Ready"))
 				{
 					ClientScene.Ready(manager.client.connection);
 
@@ -92,7 +84,7 @@ namespace UnityEngine.Networking
 
 			if (NetworkServer.active || NetworkClient.active)
 			{
-				if (GUI.Button(new Rect(xpos+200,150, 400, 100), "QUIT",guiStyle))
+				if (GUI.Button(new Rect(xpos+200,150, guiWidth/2, guiHeight), "QUIT"))
 				{
 					manager.StopHost();
 				}
@@ -101,11 +93,11 @@ namespace UnityEngine.Networking
 
 			if (!NetworkServer.active && !NetworkClient.active)
 			{
-				ypos += 100;
+				ypos += 10;
 
 				if (manager.matchMaker == null)
 				{
-					if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Enable Match Maker",guiStyle))
+					if (GUI.Button(new Rect(xpos, ypos, guiWidth, guiHeight), "Enable Match Maker"))
 					{
 						manager.StartMatchMaker();
 					}
@@ -117,19 +109,19 @@ namespace UnityEngine.Networking
 					{
 						if (manager.matches == null)
 						{
-							if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Create Internet Match",guiStyle))
+							if (GUI.Button(new Rect(xpos, ypos, guiWidth, guiHeight), "Create Internet Match"))
 							{
 								manager.matchMaker.CreateMatch(manager.matchName, manager.matchSize, true, "", manager.OnMatchCreate);
 							}
 							ypos += spacing;
 
-							GUI.Label(new Rect(xpos, ypos, 800, 100), "Room Name:",guiStyle);
-							manager.matchName = GUI.TextField(new Rect(xpos, ypos+100, 800, 100), manager.matchName,textField);
+							GUI.Label(new Rect(xpos, ypos, guiWidth, guiHeight), "Room Name:");
+							manager.matchName = GUI.TextField(new Rect(xpos, ypos+100, guiWidth, guiHeight), manager.matchName);
 							ypos += spacing;
 
-							ypos += 100;
+							ypos += 10;
 
-							if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Find Internet Match",guiStyle))
+							if (GUI.Button(new Rect(xpos, ypos, guiWidth, guiHeight), "Find Internet Match"))
 							{
 								manager.matchMaker.ListMatches(0,20, "", manager.OnMatchList);
 							}
@@ -139,7 +131,7 @@ namespace UnityEngine.Networking
 						{
 							foreach (var match in manager.matches)
 							{
-								if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Join Match:" + match.name,guiStyle))
+								if (GUI.Button(new Rect(xpos, ypos, guiWidth, guiHeight), "Join Match:" + match.name))
 								{
 									manager.matchName = match.name;
 									manager.matchSize = (uint)match.currentSize;
@@ -149,8 +141,10 @@ namespace UnityEngine.Networking
 							}
 						}
 					}
-						
-					if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Disable Match Maker",guiStyle))
+
+					//Delete me
+					ypos+=20;
+					if (GUI.Button(new Rect(xpos, ypos, guiWidth, guiHeight), "Disable Match Maker"))
 					{
 						manager.StopMatchMaker();
 					}
