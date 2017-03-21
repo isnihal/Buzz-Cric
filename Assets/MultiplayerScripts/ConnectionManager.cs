@@ -7,14 +7,21 @@ public class ConnectionManager : MonoBehaviour {
 
 	//Function Purpose
 	//Check whether both client and host joins a particular game
+	//Manage the network state of the game
 	public Text testDisplay;
-
 	Player[] players;
+	bool hasClientJoined;
+
+	void Start()
+	{
+		hasClientJoined = false;
+	}
 
 	void Update () {
-		players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			testDisplay.text = "Adichu mone :D";
-		}
+		if (!hasClientJoined) {
+			players = FindObjectsOfType<Player> ();
+			if (players.Length == 2)
+				SceneManager.LoadScene ("TEST");
+			}
 	}
 }
