@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
 public class TeamManager : MonoBehaviour {
@@ -44,7 +45,7 @@ public class TeamManager : MonoBehaviour {
         flagIndex = 0;
 
         //To avoid home team same as away team,Level 3 indicates the level 02B_AWAY
-        if (Application.loadedLevel == 3)
+		if (SceneManager.GetActiveScene().buildIndex == 3)
         {
             if (flagIndex == getHomeTeamIndex())
             {
@@ -92,7 +93,7 @@ public class TeamManager : MonoBehaviour {
             {
                 flagIndex = 0;
             //To avoid home team being away team,Level 3 indicates the level 02B_AWAY
-            if (Application.loadedLevel == 3)
+			if (SceneManager.GetActiveScene().buildIndex == 3)
                 {
                 if (flagIndex == getHomeTeamIndex())
                 {
@@ -108,7 +109,7 @@ public class TeamManager : MonoBehaviour {
     {
         flagIndex--;
         //To avoid home team being away team,Level 3 indicates the level 02B_AWAY
-        if (Application.loadedLevel == 3)
+		if (SceneManager.GetActiveScene().buildIndex == 3)
         {
             if (flagIndex == getHomeTeamIndex())
             {
