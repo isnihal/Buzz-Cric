@@ -9,7 +9,7 @@ public class MultiplayerTeamManager : MonoBehaviour {
 	public Text testDisplay;
 	string hostTeam,clientTeam;
 	Player serverPlayer,clientPlayer;
-	public Canvas teamSelectCanvas,testCanvas;
+	public GameObject teamSelectCanvas,testCanvas;
 
 	void Awake()
 	{
@@ -23,12 +23,15 @@ public class MultiplayerTeamManager : MonoBehaviour {
 		if (players.Length == 2) {
 			if (players [0].isServer) {
 				if (hostTeam == "NULL") {
+					
 				}
 			}
 
 			if (!players [1].isServer) {
 				if (hostTeam == "NULL") {
-					teamSelectCanvas.enabled = false;
+					teamSelectCanvas.SetActive(true);
+					testCanvas.SetActive (false);
+					testDisplay.text = "Waiting";
 				}
 			}
 		}
