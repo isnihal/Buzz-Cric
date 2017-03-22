@@ -7,24 +7,30 @@ public class MultiplayerTeamManager : MonoBehaviour {
 
 	Player[] players;
 	public Text testDisplay;
+	string hostTeam,clientTeam;
+	Player serverPlayer,clientPlayer;
+	public Canvas teamSelectCanvas,testCanvas;
 
-	void Start()
+	void Awake()
 	{
-		players = FindObjectsOfType<Player> ();	
+		players = FindObjectsOfType<Player> ();
+		hostTeam = "NULL";
+		clientTeam = "NULL";
 	}
 
 	void Update()
 	{
-		if (players[0].isServer) {
-			testDisplay.text = "Server";
-		} else {
-			testDisplay.text = "Client";
-		}
+		if (players.Length == 2) {
+			if (players [0].isServer) {
+				if (hostTeam == "NULL") {
+				}
+			}
 
-		if (players[1].isServer) {
-			testDisplay.text = "Server";
-		} else {
-			testDisplay.text = "Client";
+			if (!players [1].isServer) {
+				if (hostTeam == "NULL") {
+					teamSelectCanvas.enabled = false;
+				}
+			}
 		}
 	}
 }
