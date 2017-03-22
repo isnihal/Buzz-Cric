@@ -11,7 +11,7 @@ public class ConnectionManager : NetworkBehaviour {
 	//Manage the network state of the game
 	public Text testDisplay;
 	Player[] players;
-	static bool hasClientJoined=false;
+	bool hasClientJoined=false;
 	string hostTeam,clientTeam;
 
 	void Start()
@@ -26,20 +26,6 @@ public class ConnectionManager : NetworkBehaviour {
 			if (players.Length == 2) {
 				hasClientJoined = true;
 				SceneManager.LoadScene ("M1_TEAMS");
-			}
-		}
-
-		if (SceneManager.GetActiveScene ().buildIndex == 9) {
-			if (players[0].isServer) {
-				testDisplay.text = "Server";
-			} else {
-				testDisplay.text = "Client";
-			}
-
-			if (players[1].isServer) {
-				testDisplay.text = "Server";
-			} else {
-				testDisplay.text = "Client";
 			}
 		}
 	}
