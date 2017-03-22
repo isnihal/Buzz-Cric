@@ -6,9 +6,9 @@ using System.Collections.Generic;
 public class MultiplayerTeamManager : MonoBehaviour {
 
 	Player[] players;
+	Player serverPlayer,clientPlayer;
 	public Text testDisplay;
 	string hostTeam,clientTeam;
-	Player serverPlayer,clientPlayer;
 	public GameObject teamSelectCanvas,testCanvas;
 
 	void Awake()
@@ -20,47 +20,32 @@ public class MultiplayerTeamManager : MonoBehaviour {
 
 	void Update()
 	{
-		if (players.Length == 2) {
-
-			////////////////////////////
+		if (players.Length == 2)
+		{
 			if (players [0].isServer) {
-				
-				if (hostTeam == "NULL") {
-					if (TeamManager.getCurrentTeam () != "NULL") 
-					{
-						players [0].teamName = TeamManager.getCurrentTeam ();
-						TeamManager.setCurrentTeamNull ();
-					}
-				}
-			} 
-			else 
-			{
-				if (hostTeam != "NULL") 
-				{
-					testDisplay.text = "Host Team(Y)";
-				}
+				serverPlayer = players [0];
+				clientPlayer = players [1];
+			} else {
+				serverPlayer = players [1];
+				clientPlayer = players [0];
 			}
-			///////////////////////////
-			if (players [1].isServer)
-			{
-				if (hostTeam == "NULL") {
-					if (TeamManager.getCurrentTeam () != "NULL") 
-					{
-						players [0].teamName = TeamManager.getCurrentTeam ();
-						TeamManager.setCurrentTeamNull ();
-					}
-				}
-			} 
-			else 
-			{
-				if (hostTeam == "NULL") {
-					teamSelectCanvas.SetActive (true);
-					testCanvas.SetActive (false);
-					testDisplay.text = "Waiting";
-				} else {
-					testDisplay.text = "Host Team(Y)";
-				}
+		}
+
+		if (hostTeam == "NULL") {
+			if (serverPlayer.isServer) {
+				if (TeamManager.getCurrentTeam () != "NULL") {
+					serverPlayer.teamName = TeamManager.getCurrentTeam ();
+					hostTeam = TeamManager.getCurrentTeam ();
+					TeamManager.setCurrentTeamNull ();
+				}	
+			} else if (clientPlayer.isClient) {
+				teamSelectCanvas.SetActive (false);
+				testCanvas.SetActive (true);
+				testDisplay.text = "Waiting";
 			}
+		} 
+		else {
+		
 		}
 	}
 }
