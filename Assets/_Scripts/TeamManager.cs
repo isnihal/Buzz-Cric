@@ -12,7 +12,7 @@ public class TeamManager : MonoBehaviour {
     public Text teamNameDisplay;//Team name display board
     int flagIndex;
     static int homeTeamIndex;
-    static string homeTeam, awayTeam;//Strings to store home and away teams
+    static string homeTeam, awayTeam,currentTeam;//Strings to store home and away teams
 
     Dictionary<int, string> teamName = new Dictionary<int, string>();
     Dictionary<int, string> fullTeamName = new Dictionary<int, string>();
@@ -54,6 +54,7 @@ public class TeamManager : MonoBehaviour {
         }
 
         chooseTeam();//Defnition below
+		currentTeam="NULL";//Multiplayer variable
     }
 
     void chooseTeam()
@@ -76,6 +77,22 @@ public class TeamManager : MonoBehaviour {
         //Function responsible for choosing the away team
         awayTeam = teamName[flagIndex];
     }
+
+	public void chooseCurrentTeam()
+	{
+		currentTeam = teamName [flagIndex];
+	}
+
+	public static void setCurrentTeamNull()
+	{
+		//For multiplayer
+		currentTeam="NULL";
+	}
+
+	public static string getCurrentTeam ()
+	{
+		return currentTeam;
+	}
 
     public void increaseFlagIndex()
     {

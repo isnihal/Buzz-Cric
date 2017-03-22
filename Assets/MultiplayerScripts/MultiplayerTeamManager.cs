@@ -21,17 +21,44 @@ public class MultiplayerTeamManager : MonoBehaviour {
 	void Update()
 	{
 		if (players.Length == 2) {
+
+			////////////////////////////
 			if (players [0].isServer) {
+				
 				if (hostTeam == "NULL") {
-					
+					if (TeamManager.getCurrentTeam () != "NULL") 
+					{
+						players [0].teamName = TeamManager.getCurrentTeam ();
+						TeamManager.setCurrentTeamNull ();
+					}
+				}
+			} 
+			else 
+			{
+				if (hostTeam != "NULL") 
+				{
+					testDisplay.text = "Host Team(Y)";
 				}
 			}
-
-			if (!players [1].isServer) {
+			///////////////////////////
+			if (players [1].isServer)
+			{
 				if (hostTeam == "NULL") {
-					teamSelectCanvas.SetActive(true);
+					if (TeamManager.getCurrentTeam () != "NULL") 
+					{
+						players [0].teamName = TeamManager.getCurrentTeam ();
+						TeamManager.setCurrentTeamNull ();
+					}
+				}
+			} 
+			else 
+			{
+				if (hostTeam == "NULL") {
+					teamSelectCanvas.SetActive (true);
 					testCanvas.SetActive (false);
 					testDisplay.text = "Waiting";
+				} else {
+					testDisplay.text = "Host Team(Y)";
 				}
 			}
 		}
