@@ -5,12 +5,19 @@ using UnityEngine.Networking;
 public class Player : NetworkBehaviour {
 	[SyncVar]
 	public string teamName;
-	NetworkIdentity networkIdentity;
+
+	public GameObject teamCanvas;
 
 	void Awake()
 	{
 		DontDestroyOnLoad (gameObject);
-		teamName = "NULL";
+	}
+
+	void Start()
+	{
+		if (!isLocalPlayer) {
+			teamCanvas.SetActive (false);
+		}
 	}
 
 	[Command]

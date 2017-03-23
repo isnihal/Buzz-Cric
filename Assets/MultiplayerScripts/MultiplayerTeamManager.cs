@@ -2,14 +2,14 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
+//using UnityEngine.SceneManagement;
 
 public class MultiplayerTeamManager : MonoBehaviour {
 
 	Player[] players;
 	Player serverPlayer,clientPlayer;
 	public Text testDisplay;
-	public GameObject teamSelectCanvas,testCanvas;
+	public GameObject testCanvas;
 
 	void Awake()
 	{
@@ -28,7 +28,7 @@ public class MultiplayerTeamManager : MonoBehaviour {
 			
 			//This code works on Server Only
 			if (serverPlayer.isServer) {
-				teamSelectCanvas.SetActive (true);
+				//teamSelectCanvas.SetActive (true);
 				testCanvas.SetActive (false);
 				if (TeamManager.getCurrentTeam () != "NULL") {
 					serverPlayer.CmdSyncTeamName (TeamManager.getCurrentTeam());
@@ -39,7 +39,7 @@ public class MultiplayerTeamManager : MonoBehaviour {
 
 			//This code works on Client Only
 			if (!clientPlayer.isServer) {
-				teamSelectCanvas.SetActive (false);
+				//teamSelectCanvas.SetActive (false);
 				testCanvas.SetActive (true);
 				testDisplay.text = "Waiting";
 			}
@@ -50,24 +50,20 @@ public class MultiplayerTeamManager : MonoBehaviour {
 
 			//This code works on server only
 			if (serverPlayer.isServer) {
-				teamSelectCanvas.SetActive (false);
+				//teamSelectCanvas.SetActive (false);
 				testCanvas.SetActive (true);
 				testDisplay.text = "Waiting";
 			}
 
 			//This code works on client only
 			if (!clientPlayer.isServer) {
-				teamSelectCanvas.SetActive (true);
+				//teamSelectCanvas.SetActive (true);
 				testCanvas.SetActive (false);
 				if (TeamManager.getCurrentTeam () != "NULL") {
 					clientPlayer.CmdSyncTeamName (TeamManager.getCurrentTeam());
 					TeamManager.setCurrentTeamNull ();
 				}
 			}
-		}
-
-		if (serverPlayer.teamName != "NULL" && clientPlayer.teamName != "NULL") {
-			SceneManager.LoadScene ("M2_SETTINGS");
 		}
 	}
 		
