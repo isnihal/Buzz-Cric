@@ -22,30 +22,34 @@ public class MultiplayerTeamManager : MonoBehaviour {
 	{
 		if (players.Length == 2)
 		{
-			if (players [0].isServer) {
-				serverPlayer = players [0];
-				clientPlayer = players [1];
-			} else {
-				serverPlayer = players [1];
-				clientPlayer = players [0];
-			}
+			serverPlayer = players [0];//Always player[0] is the server
+			clientPlayer = players [1];//Always player[1] is the client
 		}
 
-		if (hostTeam == "NULL") {
+		if (serverPlayer.teamName=="NULL") {
+			
+			//This code works on Server Only
 			if (serverPlayer.isServer) {
+				teamSelectCanvas.SetActive (true);
+				testCanvas.SetActive (false);
 				if (TeamManager.getCurrentTeam () != "NULL") {
 					serverPlayer.teamName = TeamManager.getCurrentTeam ();
-					hostTeam = TeamManager.getCurrentTeam ();
-					TeamManager.setCurrentTeamNull ();
-				}	
-			} else if (clientPlayer.isClient) {
+				}
+			}
+
+
+			//This code works on Client Only
+			if (!clientPlayer.isServer) {
 				teamSelectCanvas.SetActive (false);
 				testCanvas.SetActive (true);
 				testDisplay.text = "Waiting";
 			}
+
 		} 
+
 		else {
-		
+			Debug.Log ("Time to choose client");
 		}
 	}
+		
 }

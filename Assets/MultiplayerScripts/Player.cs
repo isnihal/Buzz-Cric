@@ -9,5 +9,12 @@ public class Player : NetworkBehaviour {
 	void Awake()
 	{
 		DontDestroyOnLoad (gameObject);
+		teamName = "NULL";
+	}
+
+	[Command]
+	public void CmdTeamName(string _teamName)
+	{
+		teamName = _teamName;
 	}
 }
