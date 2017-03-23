@@ -6,7 +6,7 @@ public class Player : NetworkBehaviour {
 	[SyncVar]
 	public string teamName;
 
-	public GameObject teamCanvas;
+	public GameObject teamCanvas,testCanvas;
 
 	void Awake()
 	{
@@ -15,8 +15,14 @@ public class Player : NetworkBehaviour {
 
 	void Start()
 	{
-		if (!isLocalPlayer) {
-			teamCanvas.SetActive (false);
+		if (isServer) {
+			if (isLocalPlayer) {
+				showTeamCanvas ();
+			}
+		} else if(!isServer) {
+			if (isLocalPlayer) {
+				showTestCanvas ();
+			}
 		}
 	}
 
@@ -33,5 +39,17 @@ public class Player : NetworkBehaviour {
 		}
 		CmdSyncTeamName (TeamManager.getCurrentTeam());
 		TeamManager.setCurrentTeamNull ();
+	}
+
+	public void showTestCanvas()
+	{
+		testCanvas.SetActive (true);
+		teamCanvas.SetActive (false);
+	}
+
+	public void showTeamCanvas()
+	{
+		teamCanvas.SetActive (true);
+		testCanvas.SetActive (false);
 	}
 }
