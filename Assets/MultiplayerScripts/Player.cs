@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 public class Player : NetworkBehaviour {
 	[SyncVar]
 	public string teamName;
+	NetworkIdentity networkIdentity;
 
 	void Awake()
 	{
@@ -13,7 +14,7 @@ public class Player : NetworkBehaviour {
 	}
 
 	[Command]
-	public void CmdTeamName(string _teamName)
+	public void CmdSyncTeamName(string _teamName)
 	{
 		teamName = _teamName;
 	}

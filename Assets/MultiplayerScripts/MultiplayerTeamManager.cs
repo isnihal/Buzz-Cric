@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class MultiplayerTeamManager : MonoBehaviour {
 
@@ -30,7 +31,7 @@ public class MultiplayerTeamManager : MonoBehaviour {
 				teamSelectCanvas.SetActive (true);
 				testCanvas.SetActive (false);
 				if (TeamManager.getCurrentTeam () != "NULL") {
-					serverPlayer.teamName = TeamManager.getCurrentTeam ();
+					serverPlayer.CmdSyncTeamName (TeamManager.getCurrentTeam());
 					TeamManager.setCurrentTeamNull ();
 				}
 			}
@@ -59,10 +60,14 @@ public class MultiplayerTeamManager : MonoBehaviour {
 				teamSelectCanvas.SetActive (true);
 				testCanvas.SetActive (false);
 				if (TeamManager.getCurrentTeam () != "NULL") {
-					clientPlayer.teamName = TeamManager.getCurrentTeam ();
+					clientPlayer.CmdSyncTeamName (TeamManager.getCurrentTeam());
 					TeamManager.setCurrentTeamNull ();
 				}
 			}
+		}
+
+		if (serverPlayer.teamName != "NULL" && clientPlayer.teamName != "NULL") {
+			SceneManager.LoadScene ("M2_SETTINGS");
 		}
 	}
 		
