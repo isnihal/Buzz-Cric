@@ -18,4 +18,13 @@ public class Player : NetworkBehaviour {
 	{
 		teamName = _teamName;
 	}
+
+	public void chooseTeam()
+	{
+		if (!isLocalPlayer) {
+			return;
+		}
+		CmdSyncTeamName (TeamManager.getCurrentTeam());
+		TeamManager.setCurrentTeamNull ();
+	}
 }

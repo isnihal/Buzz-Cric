@@ -12,13 +12,7 @@ public class ConnectionManager : NetworkBehaviour {
 	public Text testDisplay;
 	Player[] players;
 	bool hasClientJoined=false;
-	string hostTeam,clientTeam;
 
-	void Start()
-	{
-		hostTeam = "NULL";
-		clientTeam = "NULL";
-	}
 
 	void Update () {
 		if (!hasClientJoined) {
