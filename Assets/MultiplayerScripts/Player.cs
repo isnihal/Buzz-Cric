@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class Player : NetworkBehaviour {
 	[SyncVar]
@@ -9,7 +10,7 @@ public class Player : NetworkBehaviour {
 	[SyncVar]
 	public bool hostSelected;
 
-	public GameObject teamCanvas,testCanvas;
+	public GameObject teamCanvas,testCanvas,settingsCanvas;
 
 	void Awake()
 	{
@@ -18,15 +19,17 @@ public class Player : NetworkBehaviour {
 
 	void Start()
 	{
-		if (isServer) {
-			if (isLocalPlayer) {
-				showTeamCanvas ();
-			}
-		} 
+		if (teamCanvas != null && testCanvas != null) {
+			if (isServer) {
+				if (isLocalPlayer) {
+					showTeamCanvas ();
+				}
+			} 
 
-		if(!isServer) {
-			if (isLocalPlayer) {
-				showTestCanvas ();
+			if (!isServer) {
+				if (isLocalPlayer) {
+					showTestCanvas ();
+				}
 			}
 		}
 	}
@@ -75,13 +78,17 @@ public class Player : NetworkBehaviour {
 		
 	public void showTestCanvas()
 	{
-		testCanvas.SetActive (true);
-		teamCanvas.SetActive (false);
+		if (teamCanvas != null && testCanvas != null) {
+			testCanvas.SetActive (true);
+			teamCanvas.SetActive (false);
+		}
 	}
 
 	public void showTeamCanvas()
 	{
-		teamCanvas.SetActive (true);
-		testCanvas.SetActive (false);
+		if (teamCanvas != null && testCanvas != null) {
+			teamCanvas.SetActive (true);
+			testCanvas.SetActive (false);
+		}
 	}
 }
