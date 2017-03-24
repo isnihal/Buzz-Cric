@@ -6,19 +6,5 @@ using System.Collections.Generic;
 
 public class MultiplayerTeamManager : MonoBehaviour {
 
-	Player[] players;
-	Player serverPlayer,clientPlayer;
-	public Text testDisplay;
-	public GameObject testCanvas;
 
-	void Awake()
-	{
-		players = FindObjectsOfType<Player> ();
-	}
-
-	void Update()
-	{
-		
-	}
-		
 }
