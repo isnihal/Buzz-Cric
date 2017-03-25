@@ -8,15 +8,17 @@ public class Player : NetworkBehaviour {
 	public string teamName;
 
 	[SyncVar]
-	public bool hostSelected,syncHostWon,syncTossFinished;
+	public int numberOfOvers;
 
 	[SyncVar]
-	public int numberOfOvers;
+	public bool hostSelected,syncHostWon,syncTossFinished,isBatter;
 
 
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
 
 	static bool hasTossFinished,clientWon,hostWon;
+
+	bool doOnlyOnce;
 
 
 	void Awake()
@@ -26,6 +28,7 @@ public class Player : NetworkBehaviour {
 
 	void Start()
 	{
+		doOnlyOnce = true;;
 		hasTossFinished = false;
 		clientWon = false;
 		hostWon = false;
@@ -91,6 +94,22 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
+	[Command]
+	public void CmdSetBatter(bool result)
+	{
+		if (result) {
+			isBatter = true;
+		} else {
+			//Wierd logic,But works this way only :P
+			Player[] player = FindObjectsOfType<Player> ();
+			if (!player [0].isLocalPlayer) {
+				player [1].isBatter = true;
+			} else {
+				player [0].isBatter = true;
+			}
+		}
+	}
+
 	public void chooseTeam()
 	{
 		CmdSetHostSelectedTrue ();
@@ -116,6 +135,7 @@ public class Player : NetworkBehaviour {
 				}
 			}
 		}
+
 		if (teamCanvas == null && testCanvas == null) {
 			if (settingsCanvas != null && settingsWaitCanvas != null) {//Multiplayer settings
 
@@ -263,5 +283,15 @@ public class Player : NetworkBehaviour {
 		hasTossFinished = true;
 		hostWon = false;
 		clientWon = true;
+	}
+
+	public void chooseBatting()
+	{
+		CmdSetBatter (true);
+	}
+
+	public void chooseBowling()
+	{
+		CmdSetBatter (false);
 	}
 }
