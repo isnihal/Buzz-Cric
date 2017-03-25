@@ -41,7 +41,7 @@ public class TossManager : MonoBehaviour {
                 if (randomChoice == 0)
                 {
                     //Opponent chooses batting
-                    resultText.text = "YOU LOST\n\nOPPONENT BATTING";
+                    resultText.text = "YOU LOST-\n\nOPPONENT BATTING";
                     firstBatter = awayTeam;
                     secondBatter = homeTeam;
                 }

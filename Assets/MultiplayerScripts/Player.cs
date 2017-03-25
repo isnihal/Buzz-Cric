@@ -8,12 +8,15 @@ public class Player : NetworkBehaviour {
 	public string teamName;
 
 	[SyncVar]
-	public bool hostSelected;
+	public bool hostSelected,syncHostWon,syncTossFinished;
 
 	[SyncVar]
 	public int numberOfOvers;
 
-	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas;
+
+	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
+
+	static bool hasTossFinished,clientWon,hostWon;
 
 
 	void Awake()
@@ -23,6 +26,10 @@ public class Player : NetworkBehaviour {
 
 	void Start()
 	{
+		hasTossFinished = false;
+		clientWon = false;
+		hostWon = false;
+
 		if (teamCanvas != null && testCanvas != null) {//Multiplayer team manager
 			if (isServer) {
 				if (isLocalPlayer) {
@@ -48,18 +55,41 @@ public class Player : NetworkBehaviour {
 	public void CmdSetHostSelectedTrue()
 	{
 		Player[] players = FindObjectsOfType<Player> ();
-		players [0].hostSelected = true;
-		players [1].hostSelected = true;
+		if (players.Length == 2) {
+			players [0].hostSelected = true;
+			players [1].hostSelected = true;
+		}
 	}
 
 	[Command]
 	public void CmdSyncNumberOfOvers()
 	{
 		Player[] players = FindObjectsOfType<Player> ();
-		players[0].numberOfOvers = SettingsManager.getNumberOfOvers ();
-		players[1].numberOfOvers = SettingsManager.getNumberOfOvers ();
+		if (players.Length == 2) {
+			players [0].numberOfOvers = SettingsManager.getNumberOfOvers ();
+			players [1].numberOfOvers = SettingsManager.getNumberOfOvers ();
+		}
 	}
-		
+
+	[Command]
+	public void CmdsyncHostTossResult(bool result)
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].syncHostWon = result;
+			players [1].syncHostWon = result;
+		}
+	}
+
+	[Command]
+	public void CmdSyncTossFinished()
+	{	
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].syncTossFinished = true;
+			players [1].syncTossFinished = true;
+		}
+	}
 
 	public void chooseTeam()
 	{
@@ -100,7 +130,7 @@ public class Player : NetworkBehaviour {
 						showSettingsWaitCanvas ();
 					}
 				}
-			} else if (tossCanvas != null && testCanvas == null) {//Multiplayer Toss
+			} else if (tossCanvas != null && testCanvas == null && !syncTossFinished) {//Multiplayer Toss
 				
 				if (isServer) {
 					if (isLocalPlayer) {
@@ -111,6 +141,38 @@ public class Player : NetworkBehaviour {
 				if (!isServer) {
 					if (isLocalPlayer) {
 						showTossWaitCanvas ();
+					}
+				}
+			} else if (hasTossFinished || syncTossFinished) {
+				if (hostWon || syncHostWon) {
+					CmdsyncHostTossResult (true);
+					if (isServer) {
+						if (isLocalPlayer) {
+							showTossWonCanvas();
+							disableTossCanvas ();
+						}
+					} 
+
+					if (!isServer) {
+						if (isLocalPlayer) {
+							showTossLostCanvas();
+							disableTossCanvas ();
+						}
+					}
+				} else if (clientWon || !syncHostWon) {
+					CmdsyncHostTossResult (false);
+					if (isServer) {
+						if (isLocalPlayer) {
+							showTossLostCanvas();
+							disableTossCanvas();
+						}
+					} 
+
+					if (!isServer) {
+						if (isLocalPlayer) {
+							showTossWonCanvas();
+							disableTossCanvas();
+						}
 					}
 				}
 			}
@@ -165,4 +227,41 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
+	public void disableTossCanvas()
+	{
+		if (tossCanvas != null && tossWaitCanvas != null) {
+			tossCanvas.SetActive (false);
+			tossWaitCanvas.SetActive (false);
+		}
+	}
+
+	public void showTossWonCanvas()
+	{
+		if (tossWonCanvas != null && tossLostCanvas != null) {
+			tossWonCanvas.SetActive (true);
+			tossLostCanvas.SetActive (false);
+		}
+	}
+
+	public void showTossLostCanvas()
+	{
+		if (tossWonCanvas != null && tossLostCanvas != null) {
+			tossWonCanvas.SetActive (false);
+			tossLostCanvas.SetActive (true);
+		}
+	}
+
+	public static void hostWonTheToss()
+	{
+		hasTossFinished = true;
+		hostWon = true;
+		clientWon = false;
+	}
+
+	public static void clientWontTheToss()
+	{
+		hasTossFinished = true;
+		hostWon = false;
+		clientWon = true;
+	}
 }
