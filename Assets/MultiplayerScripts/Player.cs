@@ -18,7 +18,7 @@ public class Player : NetworkBehaviour {
 	public GameObject tossResultCanvas;
 	public Text timerText,statusText;
 
-	static bool hasTossFinished,clientWon,hostWon,showResult;
+	static bool hasTossFinished,clientWon,hostWon;
 
 	bool doOnlyOnce;
 
@@ -34,7 +34,6 @@ public class Player : NetworkBehaviour {
 		hasTossFinished = false;
 		clientWon = false;
 		hostWon = false;
-		showResult = false;
 
 		if (teamCanvas != null && testCanvas != null) {//Multiplayer team manager
 			if (isServer) {
