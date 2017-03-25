@@ -10,6 +10,9 @@ public class Player : NetworkBehaviour {
 	[SyncVar]
 	public bool hostSelected;
 
+	[SyncVar]
+	public int numberOfOvers;
+
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas;
 
 	bool showOnlyOnce;
@@ -49,6 +52,14 @@ public class Player : NetworkBehaviour {
 		Player[] players = FindObjectsOfType<Player> ();
 		players [0].hostSelected = true;
 		players [1].hostSelected = true;
+	}
+
+	[Command]
+	public void CmdSyncNumberOfOvers()
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		players[0].numberOfOvers = SettingsManager.getNumberOfOvers ();
+		players[1].numberOfOvers = SettingsManager.getNumberOfOvers ();
 	}
 		
 
