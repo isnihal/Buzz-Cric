@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class MultiplayerTossManager : MonoBehaviour {
+public class MultiplayerTossManager : NetworkBehaviour{
 
 	static bool hasTossFinished;
 	int tossResult;
+	Player[] players;
 
 	void Start()
 	{
 		hasTossFinished = false;
+		players = FindObjectsOfType<Player> ();
 	}
 
 	public void tossCoin(string userChoice)
@@ -32,6 +36,29 @@ public class MultiplayerTossManager : MonoBehaviour {
 				Player.clientWontTheToss();
 			}
 			hasTossFinished = true;
+		}
+	}
+
+	void Update()
+	{
+		if (players.Length == 2) {
+
+			if (players [0].isBatter || players [1].isBatter) {
+				if (players [0].isLocalPlayer) {
+					players [0].showTossResultCanvas ();
+				}
+
+				if (players [1].isLocalPlayer) {
+					players [1].showTossResultCanvas ();
+				}
+				if (players [0].isBatter) {
+					players [0].statusText.text = "You are Batting first";
+					players [1].statusText.text = "You are Bowling first";
+				} else {
+					players [1].statusText.text = "You are Batting first";
+					players [0].statusText.text = "You are Bowling first";
+				}
+			}
 		}
 	}
 }

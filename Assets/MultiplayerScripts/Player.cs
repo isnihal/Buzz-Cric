@@ -15,8 +15,10 @@ public class Player : NetworkBehaviour {
 
 
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
+	public GameObject tossResultCanvas;
+	public Text timerText,statusText;
 
-	static bool hasTossFinished,clientWon,hostWon;
+	static bool hasTossFinished,clientWon,hostWon,showResult;
 
 	bool doOnlyOnce;
 
@@ -32,6 +34,7 @@ public class Player : NetworkBehaviour {
 		hasTossFinished = false;
 		clientWon = false;
 		hostWon = false;
+		showResult = false;
 
 		if (teamCanvas != null && testCanvas != null) {//Multiplayer team manager
 			if (isServer) {
@@ -135,6 +138,7 @@ public class Player : NetworkBehaviour {
 				}
 			}
 		}
+			
 
 		if (teamCanvas == null && testCanvas == null) {
 			if (settingsCanvas != null && settingsWaitCanvas != null) {//Multiplayer settings
@@ -271,6 +275,15 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
+	public void showTossResultCanvas()
+	{
+		if (tossWonCanvas != null && tossLostCanvas != null && tossResultCanvas != null) {
+			tossResultCanvas.SetActive (true);
+			tossWonCanvas.SetActive (false);
+			tossLostCanvas.SetActive (false);
+		}
+	}
+
 	public static void hostWonTheToss()
 	{
 		hasTossFinished = true;
@@ -294,4 +307,5 @@ public class Player : NetworkBehaviour {
 	{
 		CmdSetBatter (false);
 	}
+		
 }
