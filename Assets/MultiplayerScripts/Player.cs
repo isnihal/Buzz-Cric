@@ -13,9 +13,8 @@ public class Player : NetworkBehaviour {
 	[SyncVar]
 	public int numberOfOvers;
 
-	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas;
+	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas;
 
-	bool showOnlyOnce;
 
 	void Awake()
 	{
@@ -37,7 +36,6 @@ public class Player : NetworkBehaviour {
 				}
 			}
 		} 
-		showOnlyOnce = true;
 	}
 
 	[Command]
@@ -89,8 +87,7 @@ public class Player : NetworkBehaviour {
 			}
 		}
 		if (teamCanvas == null && testCanvas == null) {
-			if (settingsCanvas != null && settingsWaitCanvas != null && showOnlyOnce) {//Multiplayer settings
-				showOnlyOnce=false;
+			if (settingsCanvas != null && settingsWaitCanvas != null) {//Multiplayer settings
 
 				if (isServer) {
 					if (isLocalPlayer) {
@@ -101,6 +98,19 @@ public class Player : NetworkBehaviour {
 				if (!isServer) {
 					if (isLocalPlayer) {
 						showSettingsWaitCanvas ();
+					}
+				}
+			} else if (tossCanvas != null && testCanvas == null) {//Multiplayer Toss
+				
+				if (isServer) {
+					if (isLocalPlayer) {
+						showTossCanvas ();
+					}
+				} 
+
+				if (!isServer) {
+					if (isLocalPlayer) {
+						showTossWaitCanvas ();
 					}
 				}
 			}
@@ -138,4 +148,21 @@ public class Player : NetworkBehaviour {
 			settingsWaitCanvas.SetActive (true);
 		}
 	}
+
+	public void showTossCanvas()
+	{
+		if (tossCanvas != null && tossWaitCanvas != null) {
+			tossCanvas.SetActive (true);
+			tossWaitCanvas.SetActive (false);
+		}
+	}
+
+	public void showTossWaitCanvas()
+	{
+		if (tossCanvas != null && tossWaitCanvas != null) {
+			tossCanvas.SetActive (false);
+			tossWaitCanvas.SetActive (true);
+		}
+	}
+
 }
