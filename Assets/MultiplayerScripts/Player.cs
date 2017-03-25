@@ -10,7 +10,9 @@ public class Player : NetworkBehaviour {
 	[SyncVar]
 	public bool hostSelected;
 
-	public GameObject teamCanvas,testCanvas,settingsCanvas;
+	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas;
+
+	bool showOnlyOnce;
 
 	void Awake()
 	{
@@ -19,7 +21,7 @@ public class Player : NetworkBehaviour {
 
 	void Start()
 	{
-		if (teamCanvas != null && testCanvas != null) {
+		if (teamCanvas != null && testCanvas != null) {//Multiplayer team manager
 			if (isServer) {
 				if (isLocalPlayer) {
 					showTeamCanvas ();
@@ -31,7 +33,8 @@ public class Player : NetworkBehaviour {
 					showTestCanvas ();
 				}
 			}
-		}
+		} 
+		showOnlyOnce = true;
 	}
 
 	[Command]
@@ -74,6 +77,23 @@ public class Player : NetworkBehaviour {
 				}
 			}
 		}
+		if (teamCanvas == null && testCanvas == null) {
+			if (settingsCanvas != null && settingsWaitCanvas != null && showOnlyOnce) {//Multiplayer settings
+				showOnlyOnce=false;
+
+				if (isServer) {
+					if (isLocalPlayer) {
+						showSettingsCanvas ();
+					}
+				} 
+
+				if (!isServer) {
+					if (isLocalPlayer) {
+						showSettingsWaitCanvas ();
+					}
+				}
+			}
+		}
 	}
 		
 	public void showTestCanvas()
@@ -89,6 +109,22 @@ public class Player : NetworkBehaviour {
 		if (teamCanvas != null && testCanvas != null) {
 			teamCanvas.SetActive (true);
 			testCanvas.SetActive (false);
+		}
+	}
+
+	public void showSettingsCanvas()
+	{
+		if (settingsCanvas != null && settingsWaitCanvas != null) {
+			settingsCanvas.SetActive (true);
+			settingsWaitCanvas.SetActive (false);
+		}
+	}
+
+	public void showSettingsWaitCanvas()
+	{
+		if (settingsCanvas != null && settingsWaitCanvas != null) {
+			settingsCanvas.SetActive (false);
+			settingsWaitCanvas.SetActive (true);
 		}
 	}
 }
