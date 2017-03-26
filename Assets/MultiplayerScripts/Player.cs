@@ -8,7 +8,7 @@ public class Player : NetworkBehaviour {
 	public string teamName;
 
 	[SyncVar]
-	public int numberOfOvers;
+	public int numberOfOvers,run;
 
 	[SyncVar]
 	public bool hostSelected,syncHostWon,syncTossFinished,isBatter;
@@ -19,6 +19,9 @@ public class Player : NetworkBehaviour {
 	public Text timerText,statusText;
 
 	static bool hasTossFinished,clientWon,hostWon;
+
+	HostBoard hostBoard;
+	ClientBoard clientBoard;
 
 	//bool doOnlyOnce;
 
@@ -46,7 +49,8 @@ public class Player : NetworkBehaviour {
 					showTestCanvas ();
 				}
 			}
-		} 
+		}
+
 	}
 
 	[Command]
@@ -111,6 +115,12 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
+	[Command]
+	public void CmdGetRun(int _runs)
+	{
+		run = _runs;
+	}
+
 	public void chooseTeam()
 	{
 		CmdSetHostSelectedTrue ();
@@ -119,6 +129,33 @@ public class Player : NetworkBehaviour {
 		}
 		CmdSyncTeamName (TeamManager.getCurrentTeam());
 		TeamManager.setCurrentTeamNull ();
+	}
+
+	public void chooseRun(int _runs)
+	{
+		if (!isLocalPlayer) {
+			return;
+		}
+		switch (_runs) {
+		case 1:
+			CmdGetRun (1);
+			break;
+		case 2:
+			CmdGetRun (2);
+			break;
+		case 3:
+			CmdGetRun (3);
+			break;
+		case 4:
+			CmdGetRun (4);
+			break;
+		case 5:
+			CmdGetRun (5);
+			break;
+		case 6:
+			CmdGetRun (6);
+			break;
+		}
 	}
 
 	void Update()
@@ -200,10 +237,26 @@ public class Player : NetworkBehaviour {
 			}
 		}
 
+
+
 		//Game Logic starts from here
 		if (tossResultCanvas == null) {//Toss result canvas is destroyed entering into game scene
 			if (isLocalPlayer) {
 				gameCanvas.SetActive (true);//Set the same game canvas for both host and client
+			}
+
+			if (hostBoard == null && clientBoard == null) {
+				hostBoard = FindObjectOfType<HostBoard> ();
+				clientBoard = FindObjectOfType<ClientBoard> ();
+			}
+
+			//Set runs respectively on hostBoad and clientBoard
+			if (isLocalPlayer) {
+				hostBoard.GetComponent<Text>().text = run + "";
+			}
+
+			if (!isLocalPlayer) {
+				clientBoard.GetComponent<Text>().text = run + "";
 			}
 		}
 	}
