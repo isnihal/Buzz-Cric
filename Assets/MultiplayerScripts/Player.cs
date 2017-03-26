@@ -22,10 +22,13 @@ public class Player : NetworkBehaviour {
 	OverBoard overBoard;
 
 	static bool hasTossFinished,clientWon,hostWon;
-	int totalBalls;
+	int totalBalls,strikerRuns,nonStrikerRuns,wicketsGone,striker,nonStriker,nextBatsman;
+	string firstBattingTeam,secondBattingTeam;
 
 	HostBoard hostBoard;
 	ClientBoard clientBoard;
+	StrikerDisplay strikerDisplay;
+	NonStrikerDisplay nonStrikerDisplay;
 
 	//bool doOnlyOnce;
 
@@ -129,8 +132,10 @@ public class Player : NetworkBehaviour {
 	public void CmdSyncBatterDisplay(string _batterString)
 	{
 		Player[] players = FindObjectsOfType<Player> ();
-		players [0].batterString = _batterString;
-		players [1].batterString = _batterString;
+		if (players.Length == 2) {
+			players [0].batterString = _batterString;
+			players [1].batterString = _batterString;
+		}
 	}
 
 	[Command]
@@ -272,7 +277,19 @@ public class Player : NetworkBehaviour {
 				runBoard = FindObjectOfType<RunBoard> ();
 				totalBalls = numberOfOvers * 6;
 				overBoard = FindObjectOfType<OverBoard> ();
-
+				strikerDisplay = FindObjectOfType<StrikerDisplay> ();
+				nonStrikerDisplay = FindObjectOfType<NonStrikerDisplay> ();
+				strikerRuns = 0;
+				nonStrikerRuns = 0;
+				wicketsGone = 0;
+				striker = 1;
+				nonStriker = 2;
+				nextBatsman = 3;
+				if (isBatter) {
+					firstBattingTeam = teamName;
+				} else {
+					secondBattingTeam = teamName;
+				}
 			}
 
 			//Set runs respectively on hostBoad and clientBoard
@@ -285,7 +302,7 @@ public class Player : NetworkBehaviour {
 			}
 
 			if (isBatter) {
-				CmdSyncBatterDisplay (teamName+":0/0");
+				CmdSyncBatterDisplay (teamName + ":0/0");
 			}
 
 			setDisplay ();
@@ -401,6 +418,8 @@ public class Player : NetworkBehaviour {
 	{
 		runBoard.GetComponent<Text> ().text = batterString;
 		overBoard.GetComponent<Text> ().text = "OVER:" + (currentBall / 6) + "." + (currentBall % 6);
+		strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker)+" 100*";
+		nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker)+" 99";
 	}
 		
 }
