@@ -15,12 +15,12 @@ public class Player : NetworkBehaviour {
 
 
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
-	public GameObject tossResultCanvas;
+	public GameObject tossResultCanvas,gameCanvas;
 	public Text timerText,statusText;
 
 	static bool hasTossFinished,clientWon,hostWon;
 
-	bool doOnlyOnce;
+	//bool doOnlyOnce;
 
 
 	void Awake()
@@ -30,7 +30,6 @@ public class Player : NetworkBehaviour {
 
 	void Start()
 	{
-		doOnlyOnce = true;;
 		hasTossFinished = false;
 		clientWon = false;
 		hostWon = false;
@@ -198,6 +197,13 @@ public class Player : NetworkBehaviour {
 						}
 					}
 				}
+			}
+		}
+
+		//Game Logic starts from here
+		if (tossResultCanvas == null) {//Toss result canvas is destroyed entering into game scene
+			if (isLocalPlayer) {
+				gameCanvas.SetActive (true);//Set the same game canvas for both host and client
 			}
 		}
 	}
