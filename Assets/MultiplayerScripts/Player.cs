@@ -8,7 +8,7 @@ public class Player : NetworkBehaviour {
 	public string teamName,batterString;
 
 	[SyncVar]
-	public int numberOfOvers,run;
+	public int numberOfOvers,run,currentBall;
 
 	[SyncVar]
 	public bool hostSelected,syncHostWon,syncTossFinished,isBatter;
@@ -19,8 +19,10 @@ public class Player : NetworkBehaviour {
 	public Text timerText,statusText,statusBoard;
 
 	RunBoard runBoard;
+	OverBoard overBoard;
 
 	static bool hasTossFinished,clientWon,hostWon;
+	int totalBalls;
 
 	HostBoard hostBoard;
 	ClientBoard clientBoard;
@@ -129,6 +131,15 @@ public class Player : NetworkBehaviour {
 		Player[] players = FindObjectsOfType<Player> ();
 		players [0].batterString = _batterString;
 		players [1].batterString = _batterString;
+	}
+
+	[Command]
+	public void CmdSyncCurrentBall()
+	{
+		currentBall++;
+		Player[] players = FindObjectsOfType<Player> ();
+		players [0].currentBall = currentBall;
+		players [1].currentBall = currentBall;
 	}
 
 	public void chooseTeam()
@@ -255,10 +266,13 @@ public class Player : NetworkBehaviour {
 				gameCanvas.SetActive (true);//Set the same game canvas for both host and client
 			}
 
-			if (hostBoard == null && clientBoard == null) {
+			if (hostBoard == null && clientBoard == null) {//This block is executed only once in M4_TEAMS ONLY
 				hostBoard = FindObjectOfType<HostBoard> ();
 				clientBoard = FindObjectOfType<ClientBoard> ();
 				runBoard = FindObjectOfType<RunBoard> ();
+				totalBalls = numberOfOvers * 6;
+				overBoard = FindObjectOfType<OverBoard> ();
+
 			}
 
 			//Set runs respectively on hostBoad and clientBoard
@@ -274,7 +288,7 @@ public class Player : NetworkBehaviour {
 				CmdSyncBatterDisplay (teamName+":0/0");
 			}
 
-			runBoard.GetComponent<Text>().text = batterString;
+			setDisplay ();
 		}
 	}
 		
@@ -381,6 +395,12 @@ public class Player : NetworkBehaviour {
 	public void chooseBowling()
 	{
 		CmdSetBatter (false);
+	}
+
+	public void setDisplay()
+	{
+		runBoard.GetComponent<Text> ().text = batterString;
+		overBoard.GetComponent<Text> ().text = "OVER:" + (currentBall / 6) + "." + (currentBall % 6);
 	}
 		
 }
