@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Player : NetworkBehaviour {
 	[SyncVar]
-	public string teamName;
+	public string teamName,batterString;
 
 	[SyncVar]
 	public int numberOfOvers,run;
@@ -16,7 +16,9 @@ public class Player : NetworkBehaviour {
 
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
 	public GameObject tossResultCanvas,gameCanvas;
-	public Text timerText,statusText;
+	public Text timerText,statusText,statusBoard;
+
+	RunBoard runBoard;
 
 	static bool hasTossFinished,clientWon,hostWon;
 
@@ -119,6 +121,14 @@ public class Player : NetworkBehaviour {
 	public void CmdGetRun(int _runs)
 	{
 		run = _runs;
+	}
+
+	[Command]
+	public void CmdSyncBatterDisplay(string _batterString)
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		players [0].batterString = _batterString;
+		players [1].batterString = _batterString;
 	}
 
 	public void chooseTeam()
@@ -248,6 +258,7 @@ public class Player : NetworkBehaviour {
 			if (hostBoard == null && clientBoard == null) {
 				hostBoard = FindObjectOfType<HostBoard> ();
 				clientBoard = FindObjectOfType<ClientBoard> ();
+				runBoard = FindObjectOfType<RunBoard> ();
 			}
 
 			//Set runs respectively on hostBoad and clientBoard
@@ -258,6 +269,12 @@ public class Player : NetworkBehaviour {
 			if (!isLocalPlayer) {
 				clientBoard.GetComponent<Text>().text = run + "";
 			}
+
+			if (isBatter) {
+				CmdSyncBatterDisplay (teamName+":0/0");
+			}
+
+			runBoard.GetComponent<Text>().text = batterString;
 		}
 	}
 		
