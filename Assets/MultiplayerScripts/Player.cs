@@ -8,10 +8,13 @@ public class Player : NetworkBehaviour {
 	public string teamName,batterString;
 
 	[SyncVar]
-	public int numberOfOvers,run,currentBall;
+	public int numberOfOvers,run,firstInningRuns,secondInningRuns,currentRun;
 
 	[SyncVar]
-	public bool hostSelected,syncHostWon,syncTossFinished,isBatter;
+	public float currentBall;
+
+	[SyncVar]
+	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall;
 
 
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
@@ -141,11 +144,28 @@ public class Player : NetworkBehaviour {
 	[Command]
 	public void CmdSyncCurrentBall()
 	{
-		currentBall++;
+		currentBall+=0.5f;
 		Player[] players = FindObjectsOfType<Player> ();
 		players [0].currentBall = currentBall;
 		players [1].currentBall = currentBall;
 	}
+
+	[Command]
+	public void CmdDeliverBall()
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (deliverBall)
+		{
+			players [0].deliverBall = false;
+			players [1].deliverBall = false;
+		} 
+		else 
+		{
+			players [0].deliverBall = true;
+			players [1].deliverBall = true;
+		}
+	}
+
 
 	public void chooseTeam()
 	{
@@ -183,6 +203,7 @@ public class Player : NetworkBehaviour {
 			break;
 		}
 	}
+
 
 	void Update()
 	{
@@ -285,10 +306,13 @@ public class Player : NetworkBehaviour {
 				striker = 1;
 				nonStriker = 2;
 				nextBatsman = 3;
-				if (isBatter) {
-					firstBattingTeam = teamName;
+				Player[] players = FindObjectsOfType<Player> ();
+				if (players [0].isBatter) {
+					firstBattingTeam = players [0].teamName;
+					secondBattingTeam = players [1].teamName;
 				} else {
-					secondBattingTeam = teamName;
+					firstBattingTeam = players [1].teamName;
+					secondBattingTeam = players [0].teamName;
 				}
 			}
 
@@ -305,7 +329,35 @@ public class Player : NetworkBehaviour {
 				CmdSyncBatterDisplay (teamName + ":0/0");
 			}
 
+
 			setDisplay ();
+
+			//Ball the ball
+			if (!deliverBall) {
+				if (!isBatter) {//Bowler balls the first ball
+					if (isLocalPlayer) {
+						statusBoard.text = "Press Any Button!";
+					}
+				} 
+
+				if (isBatter) {//Batsman react to the ball
+					if (isLocalPlayer) {
+						statusBoard.text = "Wait for the Bowler";
+					}
+				}
+			} else {
+				if (!isBatter) {//Bowler balls the first ball
+					if (isLocalPlayer) {
+						statusBoard.text = "Wait for the batsman";
+					}
+				} 
+
+				if (isBatter) {//Batsman react to the ball
+					if (isLocalPlayer) {
+						statusBoard.text = "Press any button";
+					}
+				}
+			}
 		}
 	}
 		
@@ -417,9 +469,9 @@ public class Player : NetworkBehaviour {
 	public void setDisplay()
 	{
 		runBoard.GetComponent<Text> ().text = batterString;
-		overBoard.GetComponent<Text> ().text = "OVER:" + (currentBall / 6) + "." + (currentBall % 6);
+		overBoard.GetComponent<Text> ().text = "OVER:" + ((int)currentBall / 6) + "." + ((int)currentBall % 6);
 		strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker)+" 100*";
 		nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker)+" 99";
 	}
-		
+
 }
