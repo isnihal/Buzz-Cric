@@ -20,6 +20,7 @@ public class Player : NetworkBehaviour {
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
 	public GameObject tossResultCanvas,gameCanvas;
 	public Text timerText,statusText,statusBoard;
+	public GameObject One,Two,Three,Four,Five,Six;
 
 	RunBoard runBoard;
 	OverBoard overBoard;
@@ -322,12 +323,14 @@ public class Player : NetworkBehaviour {
 				if (!isBatter) {//Bowler balls the first ball
 					if (isLocalPlayer) {
 						statusBoard.text = "Press Any Button!";
+						setActiveButtons ();
 					}
 				} 
 
 				if (isBatter) {//Batsman react to the ball
 					if (isLocalPlayer) {
 						statusBoard.text = "Wait for the Bowler";
+						setInActiveButtons ();
 					}
 				}
 			} else {
@@ -335,12 +338,14 @@ public class Player : NetworkBehaviour {
 				if (!isBatter) {//Bowler balls the first ball
 					if (isLocalPlayer) {
 						statusBoard.text = "Wait for the batsman";
+						setInActiveButtons ();
 					}
 				} 
 
 				if (isBatter) {//Batsman react to the ball
 					if (isLocalPlayer) {
 						statusBoard.text = "Press any button";
+						setActiveButtons ();
 					}
 				}
 			}
@@ -490,5 +495,24 @@ public class Player : NetworkBehaviour {
 			clientBoard.GetComponent<Text>().text = "";
 		}
 	}
-		
+
+	public void setActiveButtons()
+	{
+		One.SetActive (true);
+		Two.SetActive (true);
+		Three.SetActive (true);
+		Four.SetActive (true);
+		Five.SetActive (true);
+		Six.SetActive (true);
+	}
+
+	public void setInActiveButtons()
+	{
+		One.SetActive (false);
+		Two.SetActive (false);
+		Three.SetActive (false);
+		Four.SetActive (false);
+		Five.SetActive (false);
+		Six.SetActive (false);
+	}
 }
