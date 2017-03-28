@@ -14,7 +14,7 @@ public class Player : NetworkBehaviour {
 	public float currentBall;
 
 	[SyncVar]
-	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall;
+	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall,setDisplayOn;
 
 
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
@@ -315,22 +315,7 @@ public class Player : NetworkBehaviour {
 					secondBattingTeam = players [0].teamName;
 				}
 			}
-
-			//Set runs respectively on hostBoad and clientBoard
-			if (isLocalPlayer) {
-				hostBoard.GetComponent<Text>().text = run + "";
-			}
-
-			if (!isLocalPlayer) {
-				clientBoard.GetComponent<Text>().text = run + "";
-			}
-
-			if (isBatter) {
-				CmdSyncBatterDisplay (teamName + ":0/0");
-			}
-
-
-			setDisplay ();
+				
 
 			//Ball the ball
 			if (!deliverBall) {
@@ -346,6 +331,7 @@ public class Player : NetworkBehaviour {
 					}
 				}
 			} else {
+				
 				if (!isBatter) {//Bowler balls the first ball
 					if (isLocalPlayer) {
 						statusBoard.text = "Wait for the batsman";
@@ -357,6 +343,15 @@ public class Player : NetworkBehaviour {
 						statusBoard.text = "Press any button";
 					}
 				}
+			}
+
+
+			if (currentBall - (int)currentBall == 0) //	A ball is delivered after client and host presses a button
+			{
+				setDisplay ();
+			} 
+			else {
+				setBlankDisplay ();
 			}
 		}
 	}
@@ -472,6 +467,28 @@ public class Player : NetworkBehaviour {
 		overBoard.GetComponent<Text> ().text = "OVER:" + ((int)currentBall / 6) + "." + ((int)currentBall % 6);
 		strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker)+" 100*";
 		nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker)+" 99";
+		if (isLocalPlayer) {
+			hostBoard.GetComponent<Text>().text = run + "";
+		}
+
+		if (!isLocalPlayer) {
+			clientBoard.GetComponent<Text>().text = run + "";
+		}
+
+		if (isBatter) {
+			CmdSyncBatterDisplay (teamName + ":0/0");
+		}
 	}
 
+	public void setBlankDisplay()
+	{
+		if (isLocalPlayer) {
+			hostBoard.GetComponent<Text>().text = "";
+		}
+
+		if (!isLocalPlayer) {
+			clientBoard.GetComponent<Text>().text = "";
+		}
+	}
+		
 }
