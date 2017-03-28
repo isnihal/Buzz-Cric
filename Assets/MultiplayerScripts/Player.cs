@@ -8,7 +8,7 @@ public class Player : NetworkBehaviour {
 	public string teamName,batterString;
 
 	[SyncVar]
-	public int numberOfOvers,run,firstInningRuns,secondInningRuns,currentRun;
+	public int numberOfOvers,run,firstInningRuns,secondInningRuns;
 
 	[SyncVar]
 	public float currentBall;
@@ -147,8 +147,10 @@ public class Player : NetworkBehaviour {
 	{
 		currentBall+=0.5f;
 		Player[] players = FindObjectsOfType<Player> ();
-		players [0].currentBall = currentBall;
-		players [1].currentBall = currentBall;
+		if (players.Length == 2) {
+			players [0].currentBall = currentBall;
+			players [1].currentBall = currentBall;
+		}
 	}
 
 	[Command]
@@ -354,6 +356,7 @@ public class Player : NetworkBehaviour {
 			if (currentBall - (int)currentBall == 0) //	A ball is delivered after client and host presses a button
 			{
 				setDisplay ();
+				analyzeBall ();
 			} 
 			else {
 				setBlankDisplay ();
@@ -514,5 +517,21 @@ public class Player : NetworkBehaviour {
 		Four.SetActive (false);
 		Five.SetActive (false);
 		Six.SetActive (false);
+	}
+
+	public void analyzeBall()
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			if (players [0].run == players [1].run) {
+				Debug.Log ("Out");
+			} else {
+				if (players [0].isBatter) {
+					Debug.Log ("Runs:" + players [0].run);
+				} else {
+					Debug.Log ("Runs:" + players [1].run);
+				}
+			}
+		}
 	}
 }
