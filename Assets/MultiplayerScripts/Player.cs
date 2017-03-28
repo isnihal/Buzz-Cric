@@ -14,8 +14,7 @@ public class Player : NetworkBehaviour {
 	public float currentBall;
 
 	[SyncVar]
-	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall,setDisplayOn,isFirstInnings
-	,doOnlyOnce;
+	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall,setDisplayOn,isFirstInnings;
 
 
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
@@ -26,7 +25,7 @@ public class Player : NetworkBehaviour {
 	RunBoard runBoard;
 	OverBoard overBoard;
 
-	static bool hasTossFinished,clientWon,hostWon;
+	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce;
 	int totalBalls,strikerRuns,nonStrikerRuns,wicketsGone,striker,nonStriker,nextBatsman;
 	string firstBattingTeam,secondBattingTeam;
 
@@ -197,22 +196,6 @@ public class Player : NetworkBehaviour {
 			secondInningRuns += _runsScored;
 			players [0].secondInningRuns = secondInningRuns;
 			players [1].secondInningRuns = secondInningRuns;
-		}
-	}
-
-	[Command]
-	public void CmdDoOnlyOnce ()
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			if (doOnlyOnce) {
-				doOnlyOnce = false;
-
-			} else {
-				doOnlyOnce = true;
-			}
-			players [0].doOnlyOnce = doOnlyOnce;
-			players [1].doOnlyOnce = doOnlyOnce;
 		}
 	}
 
@@ -406,13 +389,13 @@ public class Player : NetworkBehaviour {
 				if(doOnlyOnce)
 				{
 					analyzeBall ();
-					CmdDoOnlyOnce ();
+					doOnlyOnce = false;
 				}
 				setDisplay ();
 			} 
 			else {
 				setBlankDisplay ();
-				CmdDoOnlyOnce ();
+				doOnlyOnce = true;
 			}
 		}
 	}
@@ -574,25 +557,25 @@ public class Player : NetworkBehaviour {
 
 	public void analyzeBall()
 	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			if (players [0].run == players [1].run) {
-				Debug.Log ("Out");
-			} else {
-				if (players [0].isBatter) {
-					if (isFirstInnings) {
-						CmdSyncFirstInningRuns (players [0].run);
-					} else {
-						CmdSyncSecondInningRuns (players [0].run);
-					}
+			Player[] players = FindObjectsOfType<Player> ();
+			if (players.Length == 2) {
+				if (players [0].run == players [1].run) {
+					Debug.Log ("Out");
 				} else {
-					if (isFirstInnings) {
-						CmdSyncFirstInningRuns (players [1].run);
+					if (players [0].isBatter) {
+						if (isFirstInnings) {
+							CmdSyncFirstInningRuns (players [0].run);
+						} else {
+							CmdSyncSecondInningRuns (players [0].run);
+						}
 					} else {
-						CmdSyncSecondInningRuns (players [1].run);
+						if (isFirstInnings) {
+							CmdSyncFirstInningRuns (players [1].run);
+						} else {
+							CmdSyncSecondInningRuns (players [1].run);
+						}
 					}
 				}
 			}
-		}
 	}
 }
