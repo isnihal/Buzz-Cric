@@ -14,7 +14,8 @@ public class Player : NetworkBehaviour {
 	public float currentBall;
 
 	[SyncVar]
-	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall,setDisplayOn;
+	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall,setDisplayOn,isFirstInnings
+	,doOnlyOnce;
 
 
 	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
@@ -33,8 +34,6 @@ public class Player : NetworkBehaviour {
 	ClientBoard clientBoard;
 	StrikerDisplay strikerDisplay;
 	NonStrikerDisplay nonStrikerDisplay;
-
-	//bool doOnlyOnce;
 
 
 	void Awake()
@@ -166,6 +165,54 @@ public class Player : NetworkBehaviour {
 		{
 			players [0].deliverBall = true;
 			players [1].deliverBall = true;
+		}
+	}
+
+	[Command]
+	public void CmdSyncIsFirstInnings(bool _status)
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].isFirstInnings = _status;
+			players [1].isFirstInnings = _status;
+		}
+	}
+
+	[Command]
+	public void CmdSyncFirstInningRuns(int _runsScored)
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			firstInningRuns += _runsScored;
+			players [0].firstInningRuns = firstInningRuns;
+			players [1].firstInningRuns = firstInningRuns;
+		}
+	}
+
+	[Command]
+	public void CmdSyncSecondInningRuns(int _runsScored)
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			secondInningRuns += _runsScored;
+			players [0].secondInningRuns = secondInningRuns;
+			players [1].secondInningRuns = secondInningRuns;
+		}
+	}
+
+	[Command]
+	public void CmdDoOnlyOnce ()
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			if (doOnlyOnce) {
+				doOnlyOnce = false;
+
+			} else {
+				doOnlyOnce = true;
+			}
+			players [0].doOnlyOnce = doOnlyOnce;
+			players [1].doOnlyOnce = doOnlyOnce;
 		}
 	}
 
@@ -317,6 +364,7 @@ public class Player : NetworkBehaviour {
 					firstBattingTeam = players [1].teamName;
 					secondBattingTeam = players [0].teamName;
 				}
+				CmdSyncIsFirstInnings (true);
 			}
 				
 
@@ -355,11 +403,16 @@ public class Player : NetworkBehaviour {
 
 			if (currentBall - (int)currentBall == 0) //	A ball is delivered after client and host presses a button
 			{
+				if(doOnlyOnce)
+				{
+					analyzeBall ();
+					CmdDoOnlyOnce ();
+				}
 				setDisplay ();
-				analyzeBall ();
 			} 
 			else {
 				setBlankDisplay ();
+				CmdDoOnlyOnce ();
 			}
 		}
 	}
@@ -527,9 +580,17 @@ public class Player : NetworkBehaviour {
 				Debug.Log ("Out");
 			} else {
 				if (players [0].isBatter) {
-					Debug.Log ("Runs:" + players [0].run);
+					if (isFirstInnings) {
+						CmdSyncFirstInningRuns (players [0].run);
+					} else {
+						CmdSyncSecondInningRuns (players [0].run);
+					}
 				} else {
-					Debug.Log ("Runs:" + players [1].run);
+					if (isFirstInnings) {
+						CmdSyncFirstInningRuns (players [1].run);
+					} else {
+						CmdSyncSecondInningRuns (players [1].run);
+					}
 				}
 			}
 		}
