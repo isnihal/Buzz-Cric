@@ -520,7 +520,11 @@ public class Player : NetworkBehaviour {
 		}
 
 		if (isBatter) {
-			CmdSyncBatterDisplay (teamName + ":0/0");
+			if (isFirstInnings) {
+				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/0");
+			} else {
+				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/0");
+			}
 		}
 	}
 
