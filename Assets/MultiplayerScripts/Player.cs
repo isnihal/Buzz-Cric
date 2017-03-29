@@ -8,7 +8,7 @@ public class Player : NetworkBehaviour {
 	public string teamName,batterString;
 
 	[SyncVar]
-	public int numberOfOvers,run,firstInningRuns,secondInningRuns;
+	public int numberOfOvers,run,firstInningRuns,secondInningRuns,currentOver;
 
 	[SyncVar]
 	public float currentBall;
@@ -26,8 +26,8 @@ public class Player : NetworkBehaviour {
 	OverBoard overBoard;
 
 	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce;
-	int totalBalls,strikerRuns,nonStrikerRuns,wicketsGone,striker,nonStriker,nextBatsman;
-	string firstBattingTeam,secondBattingTeam;
+	static int totalBalls,wicketsGone,striker,nonStriker,nextBatsman,strikerRuns,nonStrikerRuns;
+	static string firstBattingTeam,secondBattingTeam;
 
 	HostBoard hostBoard;
 	ClientBoard clientBoard;
@@ -199,6 +199,52 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
+	[Command]
+	public void CmdSetCurrentBallZero()
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].currentBall = 0;
+			players [1].currentBall = 0;
+		}
+	}
+
+	[Command]
+	public void CmdSyncCurrentOver()
+	{
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			currentOver++;
+			players [0].currentOver = currentOver;
+			players [1].currentOver = currentOver;
+		}
+	}
+//
+//	[Command]
+//	public void CmdSyncStrikerRuns(int _runsScored)
+//	{
+//		Player[] players = FindObjectsOfType<Player> ();
+//		if (players.Length == 2) {
+//			strikerRuns += _runsScored;
+//			players [0].strikerRuns = strikerRuns;
+//			players [1].strikerRuns = strikerRuns;
+//		}
+//	}
+//
+//	[Command]
+//	public void CmdSwapStrikerRuns()
+//	{
+//		Player[] players = FindObjectsOfType<Player> ();
+//		if (players.Length == 2) {
+//			int temp = strikerRuns;
+//			strikerRuns = nonStrikerRuns;
+//			nonStrikerRuns = strikerRuns;
+//			players [0].strikerRuns = strikerRuns;
+//			players [1].strikerRuns = strikerRuns;
+//			players [0].nonStrikerRuns = nonStrikerRuns;
+//			players [1].strikerRuns = nonStrikerRuns;
+//		}
+//	}
 
 	public void chooseTeam()
 	{
@@ -397,6 +443,8 @@ public class Player : NetworkBehaviour {
 				setBlankDisplay ();
 				doOnlyOnce = true;
 			}
+
+			calculateOvers ();
 		}
 	}
 		
@@ -505,12 +553,12 @@ public class Player : NetworkBehaviour {
 		CmdSetBatter (false);
 	}
 
-	public void setDisplay()
+	void setDisplay()
 	{
 		runBoard.GetComponent<Text> ().text = batterString;
-		overBoard.GetComponent<Text> ().text = "OVER:" + ((int)currentBall / 6) + "." + ((int)currentBall % 6);
-		strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker)+" 100*";
-		nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker)+" 99";
+		overBoard.GetComponent<Text> ().text = "OVER:" + currentOver + "." + ((int)currentBall % 6);
+		strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker)+" "+strikerRuns+"*";
+		nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker)+" "+nonStrikerRuns;
 		if (isLocalPlayer) {
 			hostBoard.GetComponent<Text>().text = run + "";
 		}
@@ -521,14 +569,14 @@ public class Player : NetworkBehaviour {
 
 		if (isBatter) {
 			if (isFirstInnings) {
-				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/0");
+				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/"+wicketsGone);
 			} else {
-				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/0");
+				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/"+wicketsGone);
 			}
 		}
 	}
 
-	public void setBlankDisplay()
+	void setBlankDisplay()
 	{
 		if (isLocalPlayer) {
 			hostBoard.GetComponent<Text>().text = "";
@@ -539,7 +587,7 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
-	public void setActiveButtons()
+	void setActiveButtons()
 	{
 		One.SetActive (true);
 		Two.SetActive (true);
@@ -549,7 +597,7 @@ public class Player : NetworkBehaviour {
 		Six.SetActive (true);
 	}
 
-	public void setInActiveButtons()
+	void setInActiveButtons()
 	{
 		One.SetActive (false);
 		Two.SetActive (false);
@@ -559,12 +607,12 @@ public class Player : NetworkBehaviour {
 		Six.SetActive (false);
 	}
 
-	public void analyzeBall()
+	void analyzeBall()
 	{
 			Player[] players = FindObjectsOfType<Player> ();
 			if (players.Length == 2) {
 				if (players [0].run == players [1].run) {
-					Debug.Log ("Out");
+					wicketFall ();
 				} else {
 					if (players [0].isBatter) {
 						if (isFirstInnings) {
@@ -572,14 +620,42 @@ public class Player : NetworkBehaviour {
 						} else {
 							CmdSyncSecondInningRuns (players [0].run);
 						}
+						strikerRuns += players [0].run;
 					} else {
 						if (isFirstInnings) {
 							CmdSyncFirstInningRuns (players [1].run);
 						} else {
 							CmdSyncSecondInningRuns (players [1].run);
 						}
+						strikerRuns += players [1].run;
 					}
 				}
 			}
+	}
+
+	void wicketFall()
+	{
+		wicketsGone++;
+		striker = nextBatsman;
+		//After first wicket nextBatsman index changes from 3(inital) to 4 and so on
+		nextBatsman++;
+		strikerRuns = 0;
+	}
+
+	void calculateOvers()
+	{
+		if (((int)currentBall%6==0) && (int)currentBall!=0)
+		{
+			//End of one over
+			CmdSyncCurrentOver ();
+			CmdSetCurrentBallZero ();
+			//Strike Rotation
+			int swap = striker;
+			striker = nonStriker;
+			nonStriker = swap;
+			swap = strikerRuns;
+			strikerRuns = nonStrikerRuns;
+			nonStrikerRuns = swap;
+		}
 	}
 }
