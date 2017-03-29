@@ -650,12 +650,12 @@ public class Player : NetworkBehaviour {
 			CmdSyncCurrentOver ();
 			CmdSetCurrentBallZero ();
 			//Strike Rotation
-			int swap = striker;
+			/*int swap = striker;
 			striker = nonStriker;
 			nonStriker = swap;
 			swap = strikerRuns;
 			strikerRuns = nonStrikerRuns;
-			nonStrikerRuns = swap;
+			nonStrikerRuns = swap;*/
 		}
 	}
 }
