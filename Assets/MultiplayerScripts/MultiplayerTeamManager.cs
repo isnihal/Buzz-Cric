@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class MultiplayerTeamManager : MonoBehaviour {
 
+	//A Local scene manager that loads the settings screen after both players select teams
+
 	Player[] players;
 	int numberOfChildrenDestroyed;
 

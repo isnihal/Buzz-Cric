@@ -17,7 +17,7 @@ public class ConnectionManager : NetworkBehaviour {
 	void Update () {
 		if (!hasClientJoined) {
 			players = FindObjectsOfType<Player> ();
-			if (players.Length == 2) {
+			if (players.Length == 2) {//Host(1)+Client(1) joined
 				hasClientJoined = true;
 				SceneManager.LoadScene ("M1_TEAMS");
 			}

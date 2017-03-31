@@ -4,6 +4,8 @@ using UnityEngine.Networking;
 
 public class Multiplayer : NetworkBehaviour {
 
+	//TO BE DELETED ON RELEASE
+
 	[SyncVar]
 	public int run;
 

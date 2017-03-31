@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 
 public class MultiplayerSettingsManager : MonoBehaviour {
 
+	//A function similar to local scene manager,Load the toss and delete unwanted objects in the player
+
 	Player[] players;
 	int numberOfChildrenDestroyed;
 

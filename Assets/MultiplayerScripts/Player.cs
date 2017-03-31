@@ -4,6 +4,9 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 public class Player : NetworkBehaviour {
+
+	//--------------------------Sync Vars------------------------------
+	//A sync var syncs values from server to client
 	[SyncVar]
 	public string teamName,batterString;
 
@@ -15,38 +18,53 @@ public class Player : NetworkBehaviour {
 
 	[SyncVar]
 	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall,setDisplayOn,isFirstInnings;
+	//-----------------------------------------------------------------
 
 
-	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas,tossWonCanvas,tossLostCanvas;
-	public GameObject tossResultCanvas,gameCanvas;
+	//Display objects to be toggled on and off
+	public GameObject teamCanvas,testCanvas,settingsCanvas,settingsWaitCanvas,tossCanvas,tossWaitCanvas
+	,tossWonCanvas,tossLostCanvas,tossResultCanvas,gameCanvas,One,Two,Three,Four,Five,Six;
+
 	public Text timerText,statusText,statusBoard;
-	public GameObject One,Two,Three,Four,Five,Six;
+	//------------------------------------------------------------------
 
+
+	//Common Board for displaying runs and overs
 	RunBoard runBoard;
 	OverBoard overBoard;
+	//------------------------------------------------------------------
 
+	//Static variables used for local calculations
 	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce;
 	static int totalBalls,wicketsGone,striker,nonStriker,nextBatsman,strikerRuns,nonStrikerRuns;
 	static string firstBattingTeam,secondBattingTeam;
+	//------------------------------------------------------------------
 
+
+	//Common Displays for Host and client
 	HostBoard hostBoard;
 	ClientBoard clientBoard;
-	StrikerDisplay strikerDisplay;
-	NonStrikerDisplay nonStrikerDisplay;
+	StrikerDisplay strikerDisplay;//Striker batsman display
+	NonStrikerDisplay nonStrikerDisplay;//Non Striker batsman display
 
-
+	//Awake function is executed before the scene loads
 	void Awake()
 	{
+		//Player Object is spawned only on M0_Connection,Preserve that object through all scenes after that
 		DontDestroyOnLoad (gameObject);
 	}
 
+	//Start function is executed at the begining of every scene
 	void Start()
 	{
-		hasTossFinished = false;
-		clientWon = false;
-		hostWon = false;
+		hasTossFinished = false;//Check whether toss has finished
+		clientWon = false;//Check whether client won the toss
+		hostWon = false;//Check whether host won the toss
 
-		if (teamCanvas != null && testCanvas != null) {//Multiplayer team manager
+		if (teamCanvas != null && testCanvas != null) {//This condition is true when the scene is
+			//M1_TEAMS
+
+			//Let host first choose the teams and client wait-----------------
 			if (isServer) {
 				if (isLocalPlayer) {
 					showTeamCanvas ();
@@ -58,232 +76,12 @@ public class Player : NetworkBehaviour {
 					showTestCanvas ();
 				}
 			}
+			//------------------------------------------------------------------
 		}
 
 	}
 
-	[Command]
-	public void CmdSyncTeamName(string _teamName)
-	{
-		teamName = _teamName;
-	}
-
-	[Command]
-	public void CmdSetHostSelectedTrue()
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			players [0].hostSelected = true;
-			players [1].hostSelected = true;
-		}
-	}
-
-	[Command]
-	public void CmdSyncNumberOfOvers()
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			players [0].numberOfOvers = SettingsManager.getNumberOfOvers ();
-			players [1].numberOfOvers = SettingsManager.getNumberOfOvers ();
-		}
-	}
-
-	[Command]
-	public void CmdsyncHostTossResult(bool result)
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			players [0].syncHostWon = result;
-			players [1].syncHostWon = result;
-		}
-	}
-
-	[Command]
-	public void CmdSyncTossFinished()
-	{	
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			players [0].syncTossFinished = true;
-			players [1].syncTossFinished = true;
-		}
-	}
-
-	[Command]
-	public void CmdSetBatter(bool result)
-	{
-		if (result) {
-			isBatter = true;
-		} else {
-			//Wierd logic,But works this way only :P
-			Player[] player = FindObjectsOfType<Player> ();
-			if (!player [0].isLocalPlayer) {
-				player [1].isBatter = true;
-			} else {
-				player [0].isBatter = true;
-			}
-		}
-	}
-
-	[Command]
-	public void CmdGetRun(int _runs)
-	{
-		run = _runs;
-	}
-
-	[Command]
-	public void CmdSyncBatterDisplay(string _batterString)
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			players [0].batterString = _batterString;
-			players [1].batterString = _batterString;
-		}
-	}
-
-	[Command]
-	public void CmdSyncCurrentBall()
-	{
-		currentBall+=0.5f;
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			players [0].currentBall = currentBall;
-			players [1].currentBall = currentBall;
-		}
-	}
-
-	[Command]
-	public void CmdDeliverBall()
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (deliverBall)
-		{
-			players [0].deliverBall = false;
-			players [1].deliverBall = false;
-		} 
-		else 
-		{
-			players [0].deliverBall = true;
-			players [1].deliverBall = true;
-		}
-	}
-
-	[Command]
-	public void CmdSyncIsFirstInnings(bool _status)
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			players [0].isFirstInnings = _status;
-			players [1].isFirstInnings = _status;
-		}
-	}
-
-	[Command]
-	public void CmdSyncFirstInningRuns(int _runsScored)
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			firstInningRuns += _runsScored;
-			players [0].firstInningRuns = firstInningRuns;
-			players [1].firstInningRuns = firstInningRuns;
-		}
-	}
-
-	[Command]
-	public void CmdSyncSecondInningRuns(int _runsScored)
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			secondInningRuns += _runsScored;
-			players [0].secondInningRuns = secondInningRuns;
-			players [1].secondInningRuns = secondInningRuns;
-		}
-	}
-
-	[Command]
-	public void CmdSetCurrentBallZero()
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			players [0].currentBall = 0;
-			players [1].currentBall = 0;
-		}
-	}
-
-	[Command]
-	public void CmdSyncCurrentOver()
-	{
-		Player[] players = FindObjectsOfType<Player> ();
-		if (players.Length == 2) {
-			currentOver++;
-			players [0].currentOver = currentOver;
-			players [1].currentOver = currentOver;
-		}
-	}
-//
-//	[Command]
-//	public void CmdSyncStrikerRuns(int _runsScored)
-//	{
-//		Player[] players = FindObjectsOfType<Player> ();
-//		if (players.Length == 2) {
-//			strikerRuns += _runsScored;
-//			players [0].strikerRuns = strikerRuns;
-//			players [1].strikerRuns = strikerRuns;
-//		}
-//	}
-//
-//	[Command]
-//	public void CmdSwapStrikerRuns()
-//	{
-//		Player[] players = FindObjectsOfType<Player> ();
-//		if (players.Length == 2) {
-//			int temp = strikerRuns;
-//			strikerRuns = nonStrikerRuns;
-//			nonStrikerRuns = strikerRuns;
-//			players [0].strikerRuns = strikerRuns;
-//			players [1].strikerRuns = strikerRuns;
-//			players [0].nonStrikerRuns = nonStrikerRuns;
-//			players [1].strikerRuns = nonStrikerRuns;
-//		}
-//	}
-
-	public void chooseTeam()
-	{
-		CmdSetHostSelectedTrue ();
-		if (!isLocalPlayer) {
-			return;
-		}
-		CmdSyncTeamName (TeamManager.getCurrentTeam());
-		TeamManager.setCurrentTeamNull ();
-	}
-
-	public void chooseRun(int _runs)
-	{
-		if (!isLocalPlayer) {
-			return;
-		}
-		switch (_runs) {
-		case 1:
-			CmdGetRun (1);
-			break;
-		case 2:
-			CmdGetRun (2);
-			break;
-		case 3:
-			CmdGetRun (3);
-			break;
-		case 4:
-			CmdGetRun (4);
-			break;
-		case 5:
-			CmdGetRun (5);
-			break;
-		case 6:
-			CmdGetRun (6);
-			break;
-		}
-	}
-
-
+	//This function is executed every frame
 	void Update()
 	{
 		if (hostSelected) {
@@ -299,7 +97,7 @@ public class Player : NetworkBehaviour {
 				}
 			}
 		}
-			
+
 
 		if (teamCanvas == null && testCanvas == null) {
 			if (settingsCanvas != null && settingsWaitCanvas != null) {//Multiplayer settings
@@ -316,7 +114,7 @@ public class Player : NetworkBehaviour {
 					}
 				}
 			} else if (tossCanvas != null && testCanvas == null && !syncTossFinished) {//Multiplayer Toss
-				
+
 				if (isServer) {
 					if (isLocalPlayer) {
 						showTossCanvas ();
@@ -395,7 +193,7 @@ public class Player : NetworkBehaviour {
 				}
 				CmdSyncIsFirstInnings (true);
 			}
-				
+
 
 			//Ball the ball
 			if (!deliverBall) {
@@ -413,7 +211,7 @@ public class Player : NetworkBehaviour {
 					}
 				}
 			} else {
-				
+
 				if (!isBatter) {//Bowler balls the first ball
 					if (isLocalPlayer) {
 						statusBoard.text = "Wait for the batsman";
@@ -447,9 +245,390 @@ public class Player : NetworkBehaviour {
 			calculateOvers ();
 		}
 	}
+
+	//------------------------Command Functions----------------------------
+	//A command function sync values from client to server
+
+
+
+	[Command]
+	public void CmdSyncTeamName(string _teamName)
+	{
+		//Sync the induvidual team names of player
+		//No need of local player check since button is active in only one player
+		teamName = _teamName;
+	}
+
+	[Command]
+	public void CmdSetHostSelectedTrue()
+	{
+		//Sync the bool,to determine whether host selected their team
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].hostSelected = true;
+			players [1].hostSelected = true;
+		}
+	}
+
+	[Command]
+	public void CmdSyncNumberOfOvers()
+	{
+		//Sync the total number of overs across both player
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].numberOfOvers = SettingsManager.getNumberOfOvers ();
+			players [1].numberOfOvers = SettingsManager.getNumberOfOvers ();
+		}
+	}
+
+	[Command]
+	public void CmdsyncHostTossResult(bool result)
+	{
+		//Sync the toss result,whether host won or not
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].syncHostWon = result;
+			players [1].syncHostWon = result;
+		}
+	}
+
+	[Command]
+	public void CmdSyncTossFinished()
+	{	
+		//Sync whether the toss finished or not
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].syncTossFinished = true;
+			players [1].syncTossFinished = true;
+		}
+	}
+
+	[Command]
+	public void CmdSetBatter(bool result)
+	{
+		//Set the first batting team after the toss
+		if (result) {
+			isBatter = true;
+		} else {
+			//Wierd logic,But works this way only :P
+			Player[] player = FindObjectsOfType<Player> ();
+			if (!player [0].isLocalPlayer) {
+				player [1].isBatter = true;
+			} else {
+				player [0].isBatter = true;
+			}
+		}
+	}
+
+	[Command]
+	public void CmdGetRun(int _runs)
+	{
+		//Sync the current run scored by the batsman
+		run = _runs;
+	}
+
+	[Command]
+	public void CmdSyncBatterDisplay(string _batterString)
+	{
+		//Sync a string showing the runs scored by the batsman
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].batterString = _batterString;
+			players [1].batterString = _batterString;
+		}
+	}
+
+	[Command]
+	public void CmdSyncCurrentBall()
+	{
+		//Sync the current ball
+		//A ball is delivered after both client(0.5) and host(0.5) delivers(1)
+		currentBall+=0.5f;
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].currentBall = currentBall;
+			players [1].currentBall = currentBall;
+		}
+	}
+
+	[Command]
+	public void CmdDeliverBall()
+	{
+		//Sync whether the bowler balled a ball
+		Player[] players = FindObjectsOfType<Player> ();
+		if (deliverBall)
+		{
+			players [0].deliverBall = false;
+			players [1].deliverBall = false;
+		} 
+		else 
+		{
+			players [0].deliverBall = true;
+			players [1].deliverBall = true;
+		}
+	}
+
+	[Command]
+	public void CmdSyncIsFirstInnings(bool _status)
+	{
+		//Sync whether the current innings is first innings or not
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].isFirstInnings = _status;
+			players [1].isFirstInnings = _status;
+		}
+	}
+
+	[Command]
+	public void CmdSyncFirstInningRuns(int _runsScored)
+	{
+		//Sync the first inning runs
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			firstInningRuns += _runsScored;
+			players [0].firstInningRuns = firstInningRuns;
+			players [1].firstInningRuns = firstInningRuns;
+		}
+	}
+
+	[Command]
+	public void CmdSyncSecondInningRuns(int _runsScored)
+	{
+		//Sync the second inning runs
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			secondInningRuns += _runsScored;
+			players [0].secondInningRuns = secondInningRuns;
+			players [1].secondInningRuns = secondInningRuns;
+		}
+	}
+
+	[Command]
+	public void CmdSetCurrentBallZero()
+	{
+		///After each over,sync the current ball number to 0 (A over consists of balls from 1-6)
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].currentBall = 0;
+			players [1].currentBall = 0;
+		}
+	}
+
+	[Command]
+	public void CmdSyncCurrentOver()
+	{
+		//Sync the current over
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			currentOver++;
+			players [0].currentOver = currentOver;
+			players [1].currentOver = currentOver;
+		}
+	}
+
+	//-----------------------------------------------------------------
+
+
+	//-----------------------Public Functions-------------------------------
+	public void chooseTeam()
+	{
+		//Assign this button to choose the player's team
+		CmdSetHostSelectedTrue ();
+		if (!isLocalPlayer) {
+			return;
+		}
+		CmdSyncTeamName (TeamManager.getCurrentTeam());//Sync the team name across the network
+		TeamManager.setCurrentTeamNull ();//Team manager stores teamName as current team,a temporary variable
+		//set that variable to null
+	}
+
+	public void chooseRun(int _runs)
+	{
+
+		//Assign this to a button,for a player choose his current run
+
+		//Only assign the run to local player
+		if (!isLocalPlayer) {
+			return;
+		}
+
+		//Choose the current run
+		switch (_runs) {
+		case 1:
+			CmdGetRun (1);
+			break;
+		case 2:
+			CmdGetRun (2);
+			break;
+		case 3:
+			CmdGetRun (3);
+			break;
+		case 4:
+			CmdGetRun (4);
+			break;
+		case 5:
+			CmdGetRun (5);
+			break;
+		case 6:
+			CmdGetRun (6);
+			break;
+		}
+	}
+
+	//------------------------Local Functions-----------------------------
+
+
+	void analyzeBall()
+	{
+		//Analyze both runs made by players
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			if (players [0].run == players [1].run) 
+			{
+				//A wicket fall if both the runs are same
+				wicketFall ();
+			} 
+			else 
+			{
+				//Award the run pressed by the batter,to the batter
+				if (players [0].isBatter) {
+					if (isFirstInnings) {
+						CmdSyncFirstInningRuns (players [0].run);
+					} else {
+						CmdSyncSecondInningRuns (players [0].run);
+					}
+					strikerRuns += players [0].run;
+				} 
+
+				else 
+				{
+					if (isFirstInnings) {
+						CmdSyncFirstInningRuns (players [1].run);
+					} else {
+						CmdSyncSecondInningRuns (players [1].run);
+					}
+					strikerRuns += players [1].run;
+				}
+			}
+		}
+	}
+
+	void wicketFall()
+	{
+		//Simulate a wicket fall
+		wicketsGone++;
+		striker = nextBatsman;
+		//After first wicket nextBatsman index changes from 3(inital) to 4 and so on
+		nextBatsman++;
+		strikerRuns = 0;//Next batsman replaces the striker who got out
+	}
+
+
+	void setDisplay()
+	{
+		//Set the scoreboard displays
+		runBoard.GetComponent<Text> ().text = batterString;
+
+		overBoard.GetComponent<Text> ().text = "OVER:" + currentOver + "." + ((int)currentBall % 6);
+
+		strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker) + " " + strikerRuns + "*";
+		nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker) + " " + nonStrikerRuns;
+
+
+		//Show the current run of host
+		if (isLocalPlayer) {
+			hostBoard.GetComponent<Text> ().text = run + "";
+		}
+
+		//Show the current run of client
+		if (!isLocalPlayer) {
+			clientBoard.GetComponent<Text>().text = run + "";
+		}
+
+		//Sync the batter string to be shown on both players
+		if (isBatter) {
+			if (isFirstInnings) {
+				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/"+wicketsGone);
+			} else {
+				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/"+wicketsGone);
+			}
+		}
+	}
+
+	void setBlankDisplay()
+	{
+		//Set a blank display
+		if (isLocalPlayer) {
+			hostBoard.GetComponent<Text>().text = "";
+		}
+
+		if (!isLocalPlayer) {
+			clientBoard.GetComponent<Text>().text = "";
+		}
+	}
 		
+	void calculateOvers()
+	{
+
+		//Calculate whether an over is finished
+		if (((int)currentBall%6==0) && (int)currentBall!=0)
+		{
+			//End of one over
+			CmdSyncCurrentOver ();//Sync the over number across the network
+			CmdSetCurrentBallZero ();//Sync the current ball as zero to the network
+			//Strike Rotation
+			//rotateStrike();
+		}
+	}
+
+	void rotateStrike()
+	{
+		//Swap the striker index and striker runs
+		int swap = striker;
+		striker = nonStriker;
+		nonStriker = swap;
+		swap = strikerRuns;
+		strikerRuns = nonStrikerRuns;
+		nonStrikerRuns = swap;
+	}
+
+
+	void chooseBatting()
+	{
+		CmdSetBatter (true);
+	}
+
+	void chooseBowling()
+	{
+		CmdSetBatter (false);
+	}
+
+	public void setActiveButtons()
+	{
+		//Set the numbers buttons active
+		One.SetActive (true);
+		Two.SetActive (true);
+		Three.SetActive (true);
+		Four.SetActive (true);
+		Five.SetActive (true);
+		Six.SetActive (true);
+	}
+
+	public void setInActiveButtons()
+	{
+		//Set the number buttons inactive
+		One.SetActive (false);
+		Two.SetActive (false);
+		Three.SetActive (false);
+		Four.SetActive (false);
+		Five.SetActive (false);
+		Six.SetActive (false);
+	}
+
+
 	public void showTestCanvas()
 	{
+		//Show waiting text
 		if (teamCanvas != null && testCanvas != null) {
 			testCanvas.SetActive (true);
 			teamCanvas.SetActive (false);
@@ -529,6 +708,7 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
+	//-----------------------Static Funcitons--------------------------
 	public static void hostWonTheToss()
 	{
 		hasTossFinished = true;
@@ -542,120 +722,6 @@ public class Player : NetworkBehaviour {
 		hostWon = false;
 		clientWon = true;
 	}
+	//-----------------------------------------------------------------
 
-	public void chooseBatting()
-	{
-		CmdSetBatter (true);
-	}
-
-	public void chooseBowling()
-	{
-		CmdSetBatter (false);
-	}
-
-	void setDisplay()
-	{
-		runBoard.GetComponent<Text> ().text = batterString;
-		overBoard.GetComponent<Text> ().text = "OVER:" + currentOver + "." + ((int)currentBall % 6);
-		strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker)+" "+strikerRuns+"*";
-		nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker)+" "+nonStrikerRuns;
-		if (isLocalPlayer) {
-			hostBoard.GetComponent<Text>().text = run + "";
-		}
-
-		if (!isLocalPlayer) {
-			clientBoard.GetComponent<Text>().text = run + "";
-		}
-
-		if (isBatter) {
-			if (isFirstInnings) {
-				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/"+wicketsGone);
-			} else {
-				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/"+wicketsGone);
-			}
-		}
-	}
-
-	void setBlankDisplay()
-	{
-		if (isLocalPlayer) {
-			hostBoard.GetComponent<Text>().text = "";
-		}
-
-		if (!isLocalPlayer) {
-			clientBoard.GetComponent<Text>().text = "";
-		}
-	}
-
-	void setActiveButtons()
-	{
-		One.SetActive (true);
-		Two.SetActive (true);
-		Three.SetActive (true);
-		Four.SetActive (true);
-		Five.SetActive (true);
-		Six.SetActive (true);
-	}
-
-	void setInActiveButtons()
-	{
-		One.SetActive (false);
-		Two.SetActive (false);
-		Three.SetActive (false);
-		Four.SetActive (false);
-		Five.SetActive (false);
-		Six.SetActive (false);
-	}
-
-	void analyzeBall()
-	{
-			Player[] players = FindObjectsOfType<Player> ();
-			if (players.Length == 2) {
-				if (players [0].run == players [1].run) {
-					wicketFall ();
-				} else {
-					if (players [0].isBatter) {
-						if (isFirstInnings) {
-							CmdSyncFirstInningRuns (players [0].run);
-						} else {
-							CmdSyncSecondInningRuns (players [0].run);
-						}
-						strikerRuns += players [0].run;
-					} else {
-						if (isFirstInnings) {
-							CmdSyncFirstInningRuns (players [1].run);
-						} else {
-							CmdSyncSecondInningRuns (players [1].run);
-						}
-						strikerRuns += players [1].run;
-					}
-				}
-			}
-	}
-
-	void wicketFall()
-	{
-		wicketsGone++;
-		striker = nextBatsman;
-		//After first wicket nextBatsman index changes from 3(inital) to 4 and so on
-		nextBatsman++;
-		strikerRuns = 0;
-	}
-
-	void calculateOvers()
-	{
-		if (((int)currentBall%6==0) && (int)currentBall!=0)
-		{
-			//End of one over
-			CmdSyncCurrentOver ();
-			CmdSetCurrentBallZero ();
-			//Strike Rotation
-			/*int swap = striker;
-			striker = nonStriker;
-			nonStriker = swap;
-			swap = strikerRuns;
-			strikerRuns = nonStrikerRuns;
-			nonStrikerRuns = swap;*/
-		}
-	}
 }
