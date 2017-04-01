@@ -18,7 +18,7 @@ public class Player : NetworkBehaviour {
 	public float currentBall;
 
 	[SyncVar]
-	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,deliverBall,setDisplayOn,isFirstInnings
+	public bool hostSelected,syncHostWon,syncTossFinished,isBatter,isBowler,deliverBall,setDisplayOn,isFirstInnings
 	,isGameOver;
 	//-----------------------------------------------------------------
 
@@ -329,19 +329,20 @@ public class Player : NetworkBehaviour {
 	}
 
 	[Command]
-	public void CmdSetBatter(bool result)
+	public void CmdSetBatter()
 	{
-		//Set the first batting team after the toss
-		if (result) {
-			isBatter = true;
+		isBatter = true;
+	}
+
+	[Command]
+	public void CmdSetBowler()
+	{
+		isBowler = true;
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players [0].isBowler) {
+			players [1].isBatter = true;
 		} else {
-			//Wierd logic,But works this way only :P
-			Player[] player = FindObjectsOfType<Player> ();
-			if (!player [0].isLocalPlayer) {
-				player [1].isBatter = true;
-			} else {
-				player [0].isBatter = true;
-			}
+			players [0].isBatter = true;
 		}
 	}
 
@@ -853,12 +854,12 @@ public class Player : NetworkBehaviour {
 
 	void chooseBatting()
 	{
-		CmdSetBatter (true);
+		CmdSetBatter ();
 	}
 
 	void chooseBowling()
 	{
-		CmdSetBatter (false);
+		CmdSetBowler ();
 	}
 
 	public void setActiveButtons()
