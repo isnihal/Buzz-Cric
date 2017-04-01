@@ -10,7 +10,11 @@ public class MultiplayerResultManager : NetworkBehaviour {
 	void Start()
 	{
 		Player[] players = FindObjectsOfType<Player> ();
-		winnerText.text = players [0].winnerNameString + "WINS";
+		if (players [0].winnerNameString != "TIE-MATCH") {
+			winnerText.text = players [0].winnerNameString + " WINS";
+		} else {
+			winnerText.text = players [0].winnerNameString + " WINS";
+		}
 		winnerScore.text = players [0].winnerScore;
 		loserScore.text = players [1].loserScore;
 	}
@@ -22,7 +26,7 @@ public class MultiplayerResultManager : NetworkBehaviour {
 			Destroy (players [i].gameObject);
 		}
 
-		NetworkManager networkManager = FindObjectsOfType<NetworkManager> ();
+		NetworkManager networkManager = FindObjectOfType<NetworkManager> ();
 		if (networkManager != null) {
 			Destroy (networkManager.gameObject);
 		}

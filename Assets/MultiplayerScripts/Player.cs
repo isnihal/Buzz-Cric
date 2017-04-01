@@ -789,10 +789,15 @@ public class Player : NetworkBehaviour {
 
 	void setResult()
 	{
-		if (targetRuns > secondInningRuns) {
+		if (secondInningRuns > targetRuns) {
 			CmdSyncResultText (secondBattingTeam, secondBattingTeam + " " + secondInningRuns + "/" + wicketsGone
 				, firstBattingTeam + " " + firstInningRuns + "/" + wicketGoneInFirstInnings);
-		} else {
+		} else if (secondInningRuns == targetRuns) {
+			CmdSyncResultText ("TIE-MATCH", secondBattingTeam + " " + secondInningRuns + "/" + wicketsGone
+				, firstBattingTeam + " " + firstInningRuns + "/" + wicketGoneInFirstInnings);
+		}
+
+		else {
 			CmdSyncResultText (firstBattingTeam, firstBattingTeam + " " + firstInningRuns + "/" + wicketGoneInFirstInnings
 				, secondBattingTeam + " " + secondInningRuns + "/" + wicketsGone);
 		}
