@@ -265,9 +265,7 @@ public class Player : NetworkBehaviour {
 			}
 
 			if (isGameOver) {
-				if (isLocalPlayer) {
-					SceneManager.LoadScene ("M5_RESULT");
-				}
+				MultiplayerGameManager.loadResult ();
 			}
 		}
 
