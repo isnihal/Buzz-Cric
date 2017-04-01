@@ -11,7 +11,8 @@ public class Player : NetworkBehaviour {
 	public string teamName,batterString;
 
 	[SyncVar]
-	public int numberOfOvers,run,firstInningRuns,secondInningRuns,currentOver;
+	public int numberOfOvers,run,firstInningRuns,secondInningRuns,currentOver,striker,nonStriker
+	,strikerRuns,nonStrikerRuns;
 
 	[SyncVar]
 	public float currentBall;
@@ -36,7 +37,7 @@ public class Player : NetworkBehaviour {
 
 	//Static variables used for local calculations
 	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce;
-	static int totalBalls,wicketsGone,striker,nonStriker,nextBatsman,strikerRuns,nonStrikerRuns;
+	static int totalBalls,wicketsGone,nextBatsman;
 	static string firstBattingTeam,secondBattingTeam;
 	//------------------------------------------------------------------
 
@@ -388,7 +389,7 @@ public class Player : NetworkBehaviour {
 			firstInningRuns += _runsScored;
 			players [0].firstInningRuns = firstInningRuns;
 			players [1].firstInningRuns = firstInningRuns;
-		}
+		}	
 	}
 
 	[Command]
@@ -423,6 +424,31 @@ public class Player : NetworkBehaviour {
 			currentOver++;
 			players [0].currentOver = currentOver;
 			players [1].currentOver = currentOver;
+		}
+	}
+
+	[Command]
+	public void CmdSyncStrikerAndNoNStriker(int _index1,int _index2)
+	{
+		//Sync the striker and non striker
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].striker = _index1;
+			players [1].striker = _index1;
+
+			players [0].nonStriker = _index2;
+			players [1].nonStriker = _index2;
+		}
+	}
+
+	[Command]
+	public void CmdSyncStrikerRuns ()
+	{
+		//Sync the striker runs
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].strikerRuns = strikerRuns;
+			players [1].currentOver = strikerRuns;
 		}
 	}
 
@@ -498,6 +524,7 @@ public class Player : NetworkBehaviour {
 						CmdSyncSecondInningRuns (players [0].run);
 					}
 					strikerRuns += players [0].run;
+					CmdSyncStrikerRuns ();
 				} 
 
 				else 
@@ -508,6 +535,7 @@ public class Player : NetworkBehaviour {
 						CmdSyncSecondInningRuns (players [1].run);
 					}
 					strikerRuns += players [1].run;
+					CmdSyncStrikerRuns ();
 				}
 			}
 		}
@@ -569,7 +597,6 @@ public class Player : NetworkBehaviour {
 		
 	void calculateOvers()
 	{
-
 		//Calculate whether an over is finished
 		if (((int)currentBall%6==0) && (int)currentBall!=0)
 		{
@@ -577,19 +604,20 @@ public class Player : NetworkBehaviour {
 			CmdSyncCurrentOver ();//Sync the over number across the network
 			CmdSetCurrentBallZero ();//Sync the current ball as zero to the network
 			//Strike Rotation
-			//rotateStrike();
+			rotateStrike();
 		}
 	}
-
-	void rotateStrike()
+		
+	public void rotateStrike()
 	{
 		//Swap the striker index and striker runs
 		int swap = striker;
 		striker = nonStriker;
 		nonStriker = swap;
-		swap = strikerRuns;
-		strikerRuns = nonStrikerRuns;
-		nonStrikerRuns = swap;
+//		swap = strikerRuns;
+//		strikerRuns = nonStrikerRuns;
+//		nonStrikerRuns = swap;
+		CmdSyncStrikerAndNoNStriker (striker, nonStriker);
 	}
 
 
