@@ -674,6 +674,7 @@ public class Player : NetworkBehaviour {
 		//Analyze both runs made by players
 		Player[] players = FindObjectsOfType<Player> ();
 		if (players.Length == 2) {
+			
 			if (players [0].run == players [1].run) 
 			{
 				//A wicket fall if both the runs are same
@@ -690,6 +691,9 @@ public class Player : NetworkBehaviour {
 					}
 					strikerRuns += players [0].run;
 					CmdSyncStrikerRuns ();
+					if (players [0].run % 2 == 1) {
+						rotateStrike ();
+					}
 				} 
 
 				else 
@@ -701,6 +705,9 @@ public class Player : NetworkBehaviour {
 					}
 					strikerRuns += players [1].run;
 					CmdSyncStrikerRuns ();
+					if (players [1].run % 2 == 1) {
+						rotateStrike ();
+					}
 				}
 			}
 		}
