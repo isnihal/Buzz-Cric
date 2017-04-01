@@ -12,7 +12,7 @@ public class Player : NetworkBehaviour {
 
 	[SyncVar]
 	public int numberOfOvers,run,firstInningRuns,secondInningRuns,currentOver,striker,nonStriker
-	,strikerRuns,nonStrikerRuns;
+	,strikerRuns,nonStrikerRuns,wicketsGone,nextBatsman;
 
 	[SyncVar]
 	public float currentBall;
@@ -37,7 +37,7 @@ public class Player : NetworkBehaviour {
 
 	//Static variables used for local calculations
 	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce;
-	static int totalBalls,wicketsGone,nextBatsman;
+	static int totalBalls;
 	static string firstBattingTeam,secondBattingTeam;
 	//------------------------------------------------------------------
 
@@ -454,7 +454,7 @@ public class Player : NetworkBehaviour {
 	[Command]
 	public void CmdSwapStrikerRuns(int _index1,int _index2)
 	{
-		//Sync the striker runs
+		//Swap the striker runs
 		Player[] players = FindObjectsOfType<Player> ();
 		if (players.Length == 2) {
 			players [0].strikerRuns = _index1;
@@ -465,6 +465,39 @@ public class Player : NetworkBehaviour {
 		}
 	}
 
+
+	[Command]
+	public void CmdSyncWicketsGone(int _wicketGone)
+	{
+		//Sync wickets gone
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].wicketsGone = _wicketGone;
+			players [1].wicketsGone = _wicketGone;
+		}
+	}
+
+	[Command]
+	public void CmdSyncNewStriker(int _index)
+	{
+		//Sync the next batsman as new striker
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].striker = _index;
+			players [1].striker = _index;
+		}
+	}
+
+	[Command]
+	public void CmdSyncNextBatsman(int _index)
+	{
+		//Sync the next batsman index
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].nextBatsman = _index;
+			players [1].nextBatsman = _index;
+		}
+	}
 	//-----------------------------------------------------------------
 
 
@@ -558,10 +591,13 @@ public class Player : NetworkBehaviour {
 	{
 		//Simulate a wicket fall
 		wicketsGone++;
-		striker = nextBatsman;
+		CmdSyncWicketsGone(wicketsGone);
+		CmdSyncNewStriker (nextBatsman);
 		//After first wicket nextBatsman index changes from 3(inital) to 4 and so on
 		nextBatsman++;
-		strikerRuns = 0;//Next batsman replaces the striker who got out
+		CmdSyncNextBatsman (nextBatsman);
+		strikerRuns = 0;
+		CmdSyncStrikerRuns ();
 	}
 
 
@@ -615,7 +651,6 @@ public class Player : NetworkBehaviour {
 		{
 			//End of one over
 			currentOver= (int)totalBalls/6;
-			Debug.Log ("Current Over:" + currentOver);
 			CmdSyncCurrentOver (currentOver);//Sync the over number across the network
 			CmdSetCurrentBallZero ();//Sync the current ball as zero to the network
 			//Strike Rotation
