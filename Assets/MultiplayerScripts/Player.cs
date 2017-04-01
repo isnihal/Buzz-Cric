@@ -61,6 +61,7 @@ public class Player : NetworkBehaviour {
 		hasTossFinished = false;//Check whether toss has finished
 		clientWon = false;//Check whether client won the toss
 		hostWon = false;//Check whether host won the toss
+		totalBalls=1;//To avoid a bug
 
 		if (teamCanvas != null && testCanvas != null) {//This condition is true when the scene is
 			//M1_TEAMS
@@ -174,7 +175,6 @@ public class Player : NetworkBehaviour {
 				hostBoard = FindObjectOfType<HostBoard> ();
 				clientBoard = FindObjectOfType<ClientBoard> ();
 				runBoard = FindObjectOfType<RunBoard> ();
-				totalBalls = numberOfOvers * 6;
 				overBoard = FindObjectOfType<OverBoard> ();
 				strikerDisplay = FindObjectOfType<StrikerDisplay> ();
 				nonStrikerDisplay = FindObjectOfType<NonStrikerDisplay> ();
@@ -234,6 +234,8 @@ public class Player : NetworkBehaviour {
 				if(doOnlyOnce)
 				{
 					analyzeBall ();
+					calculateOvers ();
+					totalBalls++;
 					doOnlyOnce = false;
 				}
 				setDisplay ();
@@ -242,8 +244,6 @@ public class Player : NetworkBehaviour {
 				setBlankDisplay ();
 				doOnlyOnce = true;
 			}
-
-			calculateOvers ();
 		}
 	}
 
@@ -416,14 +416,13 @@ public class Player : NetworkBehaviour {
 	}
 
 	[Command]
-	public void CmdSyncCurrentOver()
+	public void CmdSyncCurrentOver(int _currentOver)
 	{
 		//Sync the current over
 		Player[] players = FindObjectsOfType<Player> ();
 		if (players.Length == 2) {
-			currentOver++;
-			players [0].currentOver = currentOver;
-			players [1].currentOver = currentOver;
+			players [0].currentOver = _currentOver;
+			players [1].currentOver = _currentOver;
 		}
 	}
 
@@ -448,7 +447,21 @@ public class Player : NetworkBehaviour {
 		Player[] players = FindObjectsOfType<Player> ();
 		if (players.Length == 2) {
 			players [0].strikerRuns = strikerRuns;
-			players [1].currentOver = strikerRuns;
+			players [1].strikerRuns = strikerRuns;
+		}
+	}
+
+	[Command]
+	public void CmdSwapStrikerRuns(int _index1,int _index2)
+	{
+		//Sync the striker runs
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+			players [0].strikerRuns = _index1;
+			players [1].strikerRuns = _index1;
+
+			players [0].nonStrikerRuns = _index2;
+			players [1].nonStrikerRuns = _index2;
 		}
 	}
 
@@ -601,7 +614,9 @@ public class Player : NetworkBehaviour {
 		if (((int)currentBall%6==0) && (int)currentBall!=0)
 		{
 			//End of one over
-			CmdSyncCurrentOver ();//Sync the over number across the network
+			currentOver= (int)totalBalls/6;
+			Debug.Log ("Current Over:" + currentOver);
+			CmdSyncCurrentOver (currentOver);//Sync the over number across the network
 			CmdSetCurrentBallZero ();//Sync the current ball as zero to the network
 			//Strike Rotation
 			rotateStrike();
@@ -614,10 +629,12 @@ public class Player : NetworkBehaviour {
 		int swap = striker;
 		striker = nonStriker;
 		nonStriker = swap;
-//		swap = strikerRuns;
-//		strikerRuns = nonStrikerRuns;
-//		nonStrikerRuns = swap;
 		CmdSyncStrikerAndNoNStriker (striker, nonStriker);
+		swap = strikerRuns;
+		strikerRuns = nonStrikerRuns;
+		nonStrikerRuns = swap;
+		CmdSwapStrikerRuns (strikerRuns,nonStrikerRuns);
+
 	}
 
 
@@ -737,6 +754,7 @@ public class Player : NetworkBehaviour {
 	}
 
 	//-----------------------Static Funcitons--------------------------
+
 	public static void hostWonTheToss()
 	{
 		hasTossFinished = true;
