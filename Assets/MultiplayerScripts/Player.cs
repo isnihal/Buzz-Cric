@@ -169,7 +169,7 @@ public class Player : NetworkBehaviour {
 
 
 		//Game Logic starts from here
-		if (tossResultCanvas == null) {//Toss result canvas is destroyed entering into game scene
+		if (tossResultCanvas == null && gameCanvas!=null) {//Toss result canvas is destroyed entering into game scene
 			if (isLocalPlayer) {
 				gameCanvas.SetActive (true);//Set the same game canvas for both host and client
 			}
@@ -273,8 +273,6 @@ public class Player : NetworkBehaviour {
 
 	//------------------------Command Functions----------------------------
 	//A command function sync values from client to server
-
-
 
 	[Command]
 	public void CmdSyncTeamName(string _teamName)
@@ -722,35 +720,37 @@ public class Player : NetworkBehaviour {
 
 	void setDisplay()
 	{
-		//Set the scoreboard displays
-		runBoard.GetComponent<Text> ().text = batterString;
+		if (gameCanvas != null) {
+			//Set the scoreboard displays
+			runBoard.GetComponent<Text> ().text = batterString;
 
-		overBoard.GetComponent<Text> ().text = "OVER:" + currentOver + "." + ((int)currentBall % 6);
+			overBoard.GetComponent<Text> ().text = "OVER:" + currentOver + "." + ((int)currentBall % 6);
 
-		if (isFirstInnings) {
-			strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker) + " " + strikerRuns + "*";
-			nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker) + " " + nonStrikerRuns;
-		} else {
-			strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (secondBattingTeam, striker) + " " + strikerRuns + "*";
-			nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (secondBattingTeam, nonStriker) + " " + nonStrikerRuns;
-		}
-
-		//Show the current run of host
-		if (isLocalPlayer) {
-			hostBoard.GetComponent<Text> ().text = run + "";
-		}
-
-		//Show the current run of client
-		if (!isLocalPlayer) {
-			clientBoard.GetComponent<Text>().text = run + "";
-		}
-
-		//Sync the batter string to be shown on both players
-		if (isBatter) {
 			if (isFirstInnings) {
-				CmdSyncBatterDisplay (teamName + ":" + firstInningRuns +"/"+wicketsGone);
+				strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, striker) + " " + strikerRuns + "*";
+				nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (firstBattingTeam, nonStriker) + " " + nonStrikerRuns;
 			} else {
-				CmdSyncBatterDisplay (teamName + ":" + secondInningRuns +"/"+wicketsGone);
+				strikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (secondBattingTeam, striker) + " " + strikerRuns + "*";
+				nonStrikerDisplay.GetComponent<Text> ().text = TeamManager.getBatsman (secondBattingTeam, nonStriker) + " " + nonStrikerRuns;
+			}
+
+			//Show the current run of host
+			if (isLocalPlayer) {
+				hostBoard.GetComponent<Text> ().text = run + "";
+			}
+
+			//Show the current run of client
+			if (!isLocalPlayer) {
+				clientBoard.GetComponent<Text> ().text = run + "";
+			}
+
+			//Sync the batter string to be shown on both players
+			if (isBatter) {
+				if (isFirstInnings) {
+					CmdSyncBatterDisplay (teamName + ":" + firstInningRuns + "/" + wicketsGone);
+				} else {
+					CmdSyncBatterDisplay (teamName + ":" + secondInningRuns + "/" + wicketsGone);
+				}
 			}
 		}
 	}

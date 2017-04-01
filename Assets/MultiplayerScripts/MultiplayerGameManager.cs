@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 
 public class MultiplayerGameManager : MonoBehaviour {
 
+	static int numberOfChildrenKilled;
+
 	void Update()
 	{
 		Player[] player = FindObjectsOfType<Player> ();
@@ -16,7 +18,13 @@ public class MultiplayerGameManager : MonoBehaviour {
 	{
 		Player[] player = FindObjectsOfType<Player> ();
 		for (int i = 0; i < player.Length; i++) {
-			Destroy (player [i].gameObject);
+			numberOfChildrenKilled = 0;
+			foreach (Transform child in player[i].transform) {
+				if (numberOfChildrenKilled == 0) {
+					numberOfChildrenKilled++;
+					Destroy (child.gameObject);
+				}
+			}
 		}
 		SceneManager.LoadScene ("M5_RESULT");
 	}
