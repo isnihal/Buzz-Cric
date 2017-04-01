@@ -13,7 +13,7 @@ public class MultiplayerResultManager : NetworkBehaviour {
 		if (players [0].winnerNameString != "TIE-MATCH") {
 			winnerText.text = players [0].winnerNameString + " WINS";
 		} else {
-			winnerText.text = players [0].winnerNameString + " WINS";
+			winnerText.text = players [0].winnerNameString;
 		}
 		winnerScore.text = players [0].winnerScore;
 		loserScore.text = players [1].loserScore;

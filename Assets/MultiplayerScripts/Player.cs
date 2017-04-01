@@ -48,6 +48,7 @@ public class Player : NetworkBehaviour {
 	ClientBoard clientBoard;
 	StrikerDisplay strikerDisplay;//Striker batsman display
 	NonStrikerDisplay nonStrikerDisplay;//Non Striker batsman display
+	TargetBoard targetDisplay;
 
 	//Awake function is executed before the scene loads
 	void Awake()
@@ -180,6 +181,7 @@ public class Player : NetworkBehaviour {
 				overBoard = FindObjectOfType<OverBoard> ();
 				strikerDisplay = FindObjectOfType<StrikerDisplay> ();
 				nonStrikerDisplay = FindObjectOfType<NonStrikerDisplay> ();
+				targetDisplay = FindObjectOfType<TargetBoard> ();
 				strikerRuns = 0;
 				nonStrikerRuns = 0;
 				wicketsGone = 0;
@@ -258,6 +260,7 @@ public class Player : NetworkBehaviour {
 			} 
 
 			else {
+				setTargetDisplay ();
 				if (inningsBreak () && secondInningRuns!=0) {
 					CmdSyncGameOver ();
 				}
@@ -268,7 +271,6 @@ public class Player : NetworkBehaviour {
 				MultiplayerGameManager.loadResult ();
 			}
 		}
-
 	}
 
 	//------------------------Command Functions----------------------------
@@ -837,6 +839,15 @@ public class Player : NetworkBehaviour {
 		nonStrikerRuns = swap;
 		CmdSwapStrikerRuns (strikerRuns,nonStrikerRuns);
 
+	}
+
+	void setTargetDisplay()
+	{
+		if (targetRuns != 0 && (targetRuns-secondInningRuns)>0) {
+			targetDisplay.GetComponent<Text> ().text = "TO WIN:" + (targetRuns - secondInningRuns);
+		} else {
+			targetDisplay.GetComponent<Text> ().text = "";
+		}
 	}
 
 
