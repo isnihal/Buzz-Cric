@@ -8,7 +8,7 @@ public class Player : NetworkBehaviour {
 	//--------------------------Sync Vars------------------------------
 	//A sync var syncs values from server to client
 	[SyncVar]
-	public string teamName,batterString;
+	public string teamName,batterString,winnerNameString,winnerScore,loserScore;
 
 	[SyncVar]
 	public int numberOfOvers,run,firstInningRuns,secondInningRuns,currentOver,striker,nonStriker
@@ -38,7 +38,7 @@ public class Player : NetworkBehaviour {
 
 	//Static variables used for local calculations
 	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce,setOnlyOnce;
-	static int totalBalls;
+	static int totalBalls,wicketGoneInFirstInnings;
 	static string firstBattingTeam,secondBattingTeam;
 	//------------------------------------------------------------------
 
@@ -250,6 +250,7 @@ public class Player : NetworkBehaviour {
 
 			if (isFirstInnings) {
 				if (inningsBreak ()) {
+					wicketGoneInFirstInnings = wicketsGone;
 					CmdResetGameVariables ();
 					CmdChangeBattingTeam ();
 					CmdSyncTargetRuns (firstInningRuns + 1);
@@ -265,6 +266,7 @@ public class Player : NetworkBehaviour {
 			}
 
 			if (isGameOver) {
+				setResult ();
 				MultiplayerGameManager.loadResult ();
 			}
 		}
@@ -596,6 +598,24 @@ public class Player : NetworkBehaviour {
 			players [1].isGameOver = true;
 		}
 	}
+
+	[Command]
+	public void CmdSyncResultText(string _winnerNameString,string _winnerScore,string _loserScore)
+	{
+		//Set the result strings
+		Player[] players = FindObjectsOfType<Player> ();
+		if (players.Length == 2) {
+
+			players [0].winnerNameString = _winnerNameString;
+			players [1].winnerNameString = _winnerNameString;
+
+			players [0].winnerScore = _winnerScore;
+			players [1].winnerScore = _winnerScore;
+
+			players [0].loserScore = _loserScore;
+			players [1].loserScore = _loserScore;
+		}
+	}
 	//-----------------------------------------------------------------
 
 
@@ -764,6 +784,17 @@ public class Player : NetworkBehaviour {
 
 		if (!isLocalPlayer) {
 			clientBoard.GetComponent<Text>().text = "";
+		}
+	}
+
+	void setResult()
+	{
+		if (targetRuns > secondInningRuns) {
+			CmdSyncResultText (secondBattingTeam, secondBattingTeam + " " + secondInningRuns + "/" + wicketsGone
+				, firstBattingTeam + " " + firstInningRuns + "/" + wicketGoneInFirstInnings);
+		} else {
+			CmdSyncResultText (firstBattingTeam, firstBattingTeam + " " + firstInningRuns + "/" + wicketGoneInFirstInnings
+				, secondBattingTeam + " " + secondInningRuns + "/" + wicketsGone);
 		}
 	}
 		
