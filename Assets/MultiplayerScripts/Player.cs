@@ -38,7 +38,7 @@ public class Player : NetworkBehaviour {
 
 	//Static variables used for local calculations
 	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce,setOnlyOnce;
-	static int totalBalls,wicketGoneInFirstInnings;
+	static int wicketGoneInFirstInnings;
 	static string firstBattingTeam,secondBattingTeam;
 	//------------------------------------------------------------------
 
@@ -62,7 +62,6 @@ public class Player : NetworkBehaviour {
 		hasTossFinished = false;//Check whether toss has finished
 		clientWon = false;//Check whether client won the toss
 		hostWon = false;//Check whether host won the toss
-		totalBalls=1;//To avoid a bug
 		setOnlyOnce=true;
 	
 
@@ -238,7 +237,6 @@ public class Player : NetworkBehaviour {
 				{
 					analyzeBall ();
 					calculateOvers ();
-					totalBalls++;
 					doOnlyOnce = false;
 				}
 				setDisplay ();
@@ -544,8 +542,8 @@ public class Player : NetworkBehaviour {
 			players [0].currentBall = 0;
 			players [1].currentBall = 0;
 
-			players [0].currentOver = 0;
-			players [1].currentOver = 0;
+			players [0].CmdSyncCurrentOver (0);
+			players [1].CmdSyncCurrentOver (0);
 
 			players [0].wicketsGone = 0;
 			players [1].wicketsGone = 0;
@@ -816,8 +814,11 @@ public class Player : NetworkBehaviour {
 		if (((int)currentBall%6==0) && (int)currentBall!=0)
 		{
 			//End of one over
-			currentOver= (int)totalBalls/6;
-			CmdSyncCurrentOver (currentOver);//Sync the over number across the network
+			if(!inningsBreak())
+			{	
+				currentOver++;
+				CmdSyncCurrentOver (currentOver);//Sync the over number across the network
+			}
 			CmdSetCurrentBallZero ();//Sync the current ball as zero to the network
 			//Strike Rotation
 			rotateStrike();
