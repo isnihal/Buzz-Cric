@@ -26,29 +26,6 @@ namespace UnityEngine.Networking
 		{
 			if (!showGUI)
 				return;
-
-			if (!NetworkClient.active && !NetworkServer.active && manager.matchMaker == null)
-			{
-				if (Input.GetKeyDown(KeyCode.S))
-				{
-					manager.StartServer();
-				}
-				if (Input.GetKeyDown(KeyCode.H))
-				{
-					manager.StartHost();
-				}
-				if (Input.GetKeyDown(KeyCode.C))
-				{
-					manager.StartClient();
-				}
-			}
-			if (NetworkServer.active && NetworkClient.active)
-			{
-				if (Input.GetKeyDown(KeyCode.X))
-				{
-					manager.StopHost();
-				}
-			}
 		}
 
 		void OnGUI()
@@ -64,8 +41,8 @@ namespace UnityEngine.Networking
 			if (!showGUI)
 				return;
 
-			int xpos = 100 + offsetX;
-			int ypos = 400 + offsetY;
+			int xpos = (Screen.width / 2)-400;
+			int ypos = (Screen.height / 2)-350;
 			int spacing = 110;
 
 
@@ -92,7 +69,7 @@ namespace UnityEngine.Networking
 
 			if (NetworkServer.active || NetworkClient.active)
 			{
-				if (GUI.Button(new Rect(xpos+200,150, 400, 100), "QUIT",guiStyle))
+				if (GUI.Button(new Rect(xpos+200,40, 400, 100), "QUIT",guiStyle))
 				{
 					manager.StopHost();
 				}
