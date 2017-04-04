@@ -30,10 +30,19 @@ namespace UnityEngine.Networking
 
 		void OnGUI()
 		{
+			/*OnePlus X ref
+			 * Width:1080-800
+			 * Height:1920-100
+			 * Font size:50
+			 * Spacing:1110
+			*/
+
+			float screenHeight = Screen.height;
+			float screenWidth = Screen.width;
 			GUIStyle guiStyle = new GUIStyle(GUI.skin.button);
 			GUIStyle textField = new GUIStyle (GUI.skin.textField);
-			textField.fontSize = 50;
-			guiStyle.fontSize = 50;
+			textField.fontSize = (int)screenHeight/38;
+			guiStyle.fontSize = (int)screenHeight/38;
 
 			// Load and set Font
 			Font myFont = (Font)Resources.Load("Fonts/comic", typeof(Font));
@@ -41,9 +50,12 @@ namespace UnityEngine.Networking
 			if (!showGUI)
 				return;
 
-			int xpos = (Screen.width / 2)-400;
-			int ypos = (Screen.height / 2)-350;
-			int spacing = 110;
+
+			int spacing = (int)screenWidth / 12;
+			float width=(float)(screenWidth/1.35);
+			float height=(float)(screenHeight/19.2);
+			float xpos = (screenWidth / 2)-(width/2);
+			float ypos = (screenHeight / 2)-(height/2);
 
 
 			if (!NetworkClient.active && !NetworkServer.active && manager.matchMaker == null)
@@ -55,7 +67,7 @@ namespace UnityEngine.Networking
 
 			if (NetworkClient.active && !ClientScene.ready)
 			{
-				if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Client Ready",guiStyle))
+				if (GUI.Button(new Rect(xpos, ypos, width, height), "Client Ready",guiStyle))
 				{
 					ClientScene.Ready(manager.client.connection);
 
@@ -69,7 +81,7 @@ namespace UnityEngine.Networking
 
 			if (NetworkServer.active || NetworkClient.active)
 			{
-				if (GUI.Button(new Rect(xpos+200,40, 400, 100), "QUIT",guiStyle))
+				if (GUI.Button(new Rect(xpos+200,height-(height/2), width/2, height), "QUIT",guiStyle))
 				{
 					manager.StopHost();
 				}
@@ -78,11 +90,11 @@ namespace UnityEngine.Networking
 
 			if (!NetworkServer.active && !NetworkClient.active)
 			{
-				ypos += 100;
+				ypos += (float)(screenHeight/19.2);
 
 				if (manager.matchMaker == null)
 				{
-					if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Enable Match Maker",guiStyle))
+					if (GUI.Button(new Rect(xpos, (screenHeight/2)-height, width, height), "Enable Match Maker",guiStyle))
 					{
 						manager.StartMatchMaker();
 					}
@@ -94,19 +106,20 @@ namespace UnityEngine.Networking
 					{
 						if (manager.matches == null)
 						{
-							if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Create Internet Match",guiStyle))
+							if (GUI.Button(new Rect(xpos,screenHeight/4, width, height), "Create Internet Match",guiStyle))
 							{
 								manager.matchMaker.CreateMatch(manager.matchName, manager.matchSize, true, "", manager.OnMatchCreate);
 							}
+							ypos = (screenHeight / 4);
 							ypos += spacing;
 
-							GUI.Label(new Rect(xpos, ypos, 800, 100), "Room Name:",guiStyle);
-							manager.matchName = GUI.TextField(new Rect(xpos, ypos+100, 800, 100), manager.matchName,textField);
+							GUI.Label(new Rect(xpos, ypos, width, height), "Room Name:",guiStyle);
+							manager.matchName = GUI.TextField(new Rect(xpos, (ypos+(float)(screenHeight/19.2)), width, height), manager.matchName,textField);
 							ypos += spacing;
 
-							ypos += 100;
+							ypos += (float)(screenHeight/19.2);
 
-							if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Find Internet Match",guiStyle))
+							if (GUI.Button(new Rect(xpos, ypos, width, height), "Find Internet Match",guiStyle))
 							{
 								manager.matchMaker.ListMatches(0,20, "", manager.OnMatchList);
 							}
@@ -116,7 +129,7 @@ namespace UnityEngine.Networking
 						{
 							foreach (var match in manager.matches)
 							{
-								if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Join Match:" + match.name,guiStyle))
+								if (GUI.Button(new Rect(xpos, ypos, width, height), "Join Match:" + match.name,guiStyle))
 								{
 									manager.matchName = match.name;
 									manager.matchSize = (uint)match.currentSize;
@@ -127,7 +140,7 @@ namespace UnityEngine.Networking
 						}
 					}
 
-					if (GUI.Button(new Rect(xpos, ypos, 800, 100), "Disable Match Maker",guiStyle))
+					if (GUI.Button(new Rect(xpos, ypos, width, height), "Disable Match Maker",guiStyle))
 					{
 						manager.StopMatchMaker();
 					}
