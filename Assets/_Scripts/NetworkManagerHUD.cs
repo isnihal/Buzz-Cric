@@ -47,7 +47,7 @@ namespace UnityEngine.Networking
 				return;
 
 
-			int spacing = (int)screenWidth / 12;
+			int spacing = (int)screenWidth / 11;
 			float width=(float)(screenWidth/1.35);
 			float height=(float)(screenHeight/19.2);
 			float xpos = (screenWidth / 2)-(width/2);
@@ -102,7 +102,7 @@ namespace UnityEngine.Networking
 
 							GUI.Label(new Rect(xpos, ypos, width, height), "Room Name:",guiStyle);
 							ypos += spacing;
-							manager.matchName = GUI.TextField(new Rect(xpos, ypos, width, height), manager.matchName,guiStyle);
+							manager.matchName = GUI.TextField(new Rect(xpos, ypos, width, height), manager.matchName,textField);
 
 
 							ypos += spacing;
