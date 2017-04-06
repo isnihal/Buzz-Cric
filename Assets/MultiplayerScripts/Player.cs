@@ -37,8 +37,9 @@ public class Player : NetworkBehaviour {
 	//------------------------------------------------------------------
 
 	//Static variables used for local calculations
-	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce,setOnlyOnce;
+	static bool hasTossFinished,clientWon,hostWon,doOnlyOnce,wicketFallStatus;
 	static int wicketGoneInFirstInnings;
+	static float timeLeft;
 	static string firstBattingTeam,secondBattingTeam;
 	//------------------------------------------------------------------
 
@@ -63,7 +64,8 @@ public class Player : NetworkBehaviour {
 		hasTossFinished = false;//Check whether toss has finished
 		clientWon = false;//Check whether client won the toss
 		hostWon = false;//Check whether host won the toss
-		setOnlyOnce=true;
+		wicketFallStatus=false;
+		timeLeft = 3;
 	
 
 		if (teamCanvas != null && testCanvas != null) {//This condition is true when the scene is
@@ -201,23 +203,23 @@ public class Player : NetworkBehaviour {
 
 
 			//Ball the ball
-			if (!deliverBall) {
-				if (!isBatter) {//Bowler balls the first ball
+			if (!deliverBall && !wicketFallStatus) {
+				if (!isBatter) {//Bowler bowls the ball
 					if (isLocalPlayer) {
 						statusBoard.text = "Press Any Button!";
 						setActiveButtons ();
 					}
 				} 
 
-				if (isBatter) {//Batsman react to the ball
+				if (isBatter) {//Batsman waiting for the the ball
 					if (isLocalPlayer) {
 						statusBoard.text = "Wait for the Bowler";
 						setInActiveButtons ();
 					}
 				}
-			} else {
+			} else if (deliverBall && !wicketFallStatus) {
 
-				if (!isBatter) {//Bowler balls the first ball
+				if (!isBatter) {//Bowler delivers the bowl,and waits for batsman to hit it
 					if (isLocalPlayer) {
 						statusBoard.text = "Wait for the batsman";
 						setInActiveButtons ();
@@ -229,6 +231,15 @@ public class Player : NetworkBehaviour {
 						statusBoard.text = "Press any button";
 						setActiveButtons ();
 					}
+				}
+			} else if (wicketFallStatus) {
+				setInActiveButtons ();
+				statusBoard.text = "Out!";
+				timeLeft -= Time.deltaTime;
+				if ( timeLeft < 0 )
+				{
+					wicketFallStatus = false;
+					timeLeft = 3;
 				}
 			}
 
@@ -720,6 +731,7 @@ public class Player : NetworkBehaviour {
 		wicketsGone++;
 		CmdSyncWicketsGone(wicketsGone);
 		CmdSyncNewStriker (nextBatsman);
+		wicketFallStatus = true;
 		//After first wicket nextBatsman index changes from 3(inital) to 4 and so on
 		nextBatsman++;
 		CmdSyncNextBatsman (nextBatsman);
