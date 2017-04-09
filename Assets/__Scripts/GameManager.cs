@@ -217,6 +217,4 @@ public class GameManager : MonoBehaviour {
         Application.LoadLevel("03A_WIN");
     }
 
-
-
 }

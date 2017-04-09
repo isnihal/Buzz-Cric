@@ -28,7 +28,7 @@ public class FortuneWheelManager : MonoBehaviour
     	// Here you can set up rewards for every sector of wheel
     	switch (Mathf.RoundToInt(startAngle)) {
             case -30:
-                GameManager.setNextBallScore(0);
+                GameManager.setNextBallScore(5);
                 break;
             case -90:
                 GameManager.setNextBallScore(6);
