@@ -93,19 +93,21 @@ namespace UnityEngine.Networking
 					{
 						if (manager.matches == null)
 						{
-							if (GUI.Button(new Rect(xpos,screenHeight/4, width, height), "Create Internet Match",guiStyle))
+
+							GUI.Label(new Rect(xpos, screenHeight/4, width, height), "Room Name:",guiStyle);
+							ypos = screenHeight / 4;
+							ypos += spacing;
+							manager.matchName = GUI.TextField(new Rect(xpos, ypos, width, height), manager.matchName,textField);
+							ypos += spacing;
+
+							if (GUI.Button(new Rect(xpos,ypos, width, height), "Create Internet Match",guiStyle))
 							{
 								manager.matchMaker.CreateMatch(manager.matchName, manager.matchSize, true, "", manager.OnMatchCreate);
 							}
-							ypos = screenHeight / 4;
-							ypos += spacing;
-
-							GUI.Label(new Rect(xpos, ypos, width, height), "Room Name:",guiStyle);
-							ypos += spacing;
-							manager.matchName = GUI.TextField(new Rect(xpos, ypos, width, height), manager.matchName,textField);
-
 
 							ypos += spacing;
+
+			
 
 							if (GUI.Button(new Rect(xpos, ypos, width, height), "Find Internet Match",guiStyle))
 							{
