@@ -70,7 +70,7 @@ namespace UnityEngine.Networking
 
 			if (NetworkServer.active || NetworkClient.active)
 			{
-				if (GUI.Button(new Rect(xpos+(width/4), height-(height/2), width/2, height), "QUIT",guiStyle))
+				if (GUI.Button(new Rect(xpos+(width/1.5f),3*height, width/2, height), "QUIT",guiStyle))
 				{
 					manager.StopHost();
 				}

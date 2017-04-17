@@ -98,7 +98,7 @@ public class TossManager : MonoBehaviour {
     {
         if(hasUserDecided && hasTossFinished)
         {
-            Application.LoadLevel("02F_GAME");
+            Application.LoadLevel("02F_DIFFICULTY");
         }
     }
 }
